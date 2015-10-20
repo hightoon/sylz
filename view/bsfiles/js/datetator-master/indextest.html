@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Datetator Plugin</title>
+	<link rel="stylesheet" href="fm.datetator.jquery.css"/>
+	<style>
+		body {
+			font-family: sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		#wrapper {
+			padding: 15px;
+		}
+		#inputDatetator1,
+		#inputDatetator2 {
+			width: 100px;
+			padding: 8px 16px;
+			box-sizing: border-box;
+		}
+	</style>
+	<script src="jquery-1.11.0.min.js"></script>
+	<script src="fm.datetator.jquery.js"></script>
+	<script>
+		$(function () {
+			var $inputDatetator1 = $('#inputDatetator1');
+			$inputDatetator1.datetator();
+		});
+	</script>
+</head>
+<body>
+	<div id="wrapper">
+		<table>
+			<tr>
+				<td>
+					<label for="inputDatetator1">
+						<b>Datetator (with dimmer):</b>
+					</label><br>
+					<input id="inputDatetator1" name="inputDatetator1" value="">
+				</td>
+			</tr>
+		</table>
+	</div>
+
+</body>
+</html>
