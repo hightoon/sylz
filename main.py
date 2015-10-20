@@ -129,11 +129,14 @@ def page_index():
   except:
     redirect('/login')
   today = datetime.strftime(datetime.now(), '%Y-%m-%d')
-  startt = today + ' 00:00:00'
-  endt = today + ' 23:59:59'
-  results = db_man.period_stat((startt, endt))
-  sites = list(results[0].keys())
-  numofsite = len(sites)
+  #startdate = today + ' 00:00:00'
+  #enddate = today + ' 23:59:59'
+  #period = '%s~%s'%(startdate, enddate)
+  #results, percent_results = db_man.period_stat((startdate, enddate), siteid=1, percent=True)
+  #sites = list(results[0].keys())
+  #numofsite = len(sites)
+  #sites = list(results[0].keys())
+  #numofsite = len(sites)
   # following code for javascript, obsolete now
   #stat = []
   #for res in results:
@@ -144,12 +147,13 @@ def page_index():
   #print numofsite, '|'.join(sites), stat
   return template('./view/bsfiles/view/dashboard.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, query_results='./view/bsfiles/view/query_rslts.tpl',
+                  user=act_user, #query_results='./view/bsfiles/view/query_rslts.tpl',
+                  query_results=None,
                   #results=db_man.fetch_all_bad_brf(30),
                   #stat=json.dumps(stat), sites='|'.join(sites), 
-                  numofsite=numofsite, sites=sites, stat=results,
-                  siteids=db_man.get_site_ids(), period=today,
-                  startdate="2015-06-25", enddate="2015-06-25", siteid=1,
+                  #numofsite=numofsite, sites=sites, stat=results,
+                  siteids=db_man.get_site_ids(), period=today,  #percent=percent_results,
+                  startdate="2015-06-25", enddate="2015-06-25", siteid=db_man.get_site_ids()[0],
                   privs=privs)
 
 @route('/statdata', method='POST')

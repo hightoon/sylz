@@ -173,9 +173,9 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
+    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
     #conn = pymssql.connect('192.168.0.6\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
-    conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
+    #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
 
@@ -308,7 +308,7 @@ def fetch_cond_recs(cond, interval, brf=True):
     conn = connectdb()
     cur = conn.cursor()
 
-    cur.execute('SELECT * FROM smSites')
+    cur.execute('SELECT SiteID, SiteName FROM smSites')
     sites = cur.fetchall()
     sites = dict(sites)
 
@@ -337,7 +337,7 @@ def fetch_cond_recs(cond, interval, brf=True):
             results = [UserDb.Record.TAB_BRF_HDR]
             for row in rows:
                 sn = '站点-%d'%(row['SiteID'])
-                if sites.has_key(row['SiteID']): sn = sites(row['SiteID'])
+                if sites.has_key(row['SiteID']): sn = sites[row['SiteID']]
                 results.append((row['Xuhao'], sn, 
                                 datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
                                 row['VehicheCard'], row['smTotalWeight']/1000,
@@ -437,7 +437,7 @@ def query_history_by_plate(plate):
 def period_stat(p, percent=False, siteid=None):
     conn = connectdb()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM smSites')
+    cur.execute('SELECT SiteID, SiteName FROM smSites')
     sites = cur.fetchall()
     sites = dict(sites)
     cur.close()
@@ -492,7 +492,7 @@ def period_stat(p, percent=False, siteid=None):
 def get_site_name(siteid):
     conn = connectdb()
     cur = conn.cursor(as_dict=True)
-    cur.execute('SELECT * FROM smSites WHERE SiteID=%d', siteid)
+    cur.execute('SELECT SiteID, SiteName FROM smSites WHERE SiteID=%d', siteid)
     sn = cur.fetchone()
     conn.close()
     if sn is None: return '站点-%d'%(siteid)
@@ -509,9 +509,10 @@ def get_site_ids():
     cur = conn.cursor()
     cur.execute("SELECT SiteID FROM smSites")
     rows = cur.fetchall()
+    print rows
     if not rows:
         cur.execute("SELECT SiteID FROM smHighWayDate")
-    rows = cur.fetchall()
+        rows = cur.fetchall()
     conn.close()
     return list(set([row[0] for row in rows]))
 
