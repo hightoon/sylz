@@ -28,7 +28,7 @@ body {
 .navbar-fixed-top {
   border: 0;
   /*background-color: #2C3539;*/
-  background-color: #E8A317;
+  /*background-color: #E8A317;*/
   padding-top: 35px;
   padding-bottom: 25px;
   /*background-color: white;*/
@@ -37,6 +37,7 @@ body {
   background-repeat: no-repeat;
   background-size: 100% 100%;
   /*background-attachment: fixed;*/
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader('/static/view/bsfiles/images/header-bg.jpg');
 }
 
 /*

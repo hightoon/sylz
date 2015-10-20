@@ -1,7 +1,8 @@
 %include ('./view/bsfiles/view/html_hdr.tpl')
 
     <!--div class="container"-->
-
+    <table id="container">
+      <tr><td id="form-signin">
       <form class="form-signin" action="/login" method="POST">
         <!--h2 class="form-signin-heading" class="sr-only">登录信息管理系统</h2-->
         <label for="inputEmail" class="sr-only">用户名</label>
@@ -14,9 +15,9 @@
           </label>
         </div>
         <button class="btn btn-sm btn-primary btn-block" type="submit">登录</button>
-      </form>
+      </form></td></tr>
       <!--span class="compinfo">Powered By Sifang</span><br>
       <span class="verinfo">版本: 0.0.1</span-->
     <!--/div--> <!-- /container -->
-
+    </table
 %include ('./view/bsfiles/view/html_footer.tpl')

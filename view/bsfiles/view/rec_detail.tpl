@@ -1,4 +1,6 @@
 %include ('./view/bsfiles/view/html_hdr.tpl')
+
+<div class="container">
 <div class="panel {{panel_type}}">
   <div class="panel-heading">
     <h3 class="panel-title">记录详情</h3>
@@ -28,13 +30,13 @@
 	<tr>
 	    <td>
 	    	<label>车头照片:&nbsp</label>
-  			<img src="{{imgpath}}{{detail[1][-3]}}" alt="{{imgpath}}{{detail[1][-3]}}">
+  			<img src="{{imgpath}}{{detail[1][-3]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-3]}}">
 	    </td>
-	</tr>
-	<tr>
+	<!--/tr>
+	<tr-->
 	    <td>
 	    	<label>车尾照片:&nbsp</label>
-  			<img src="{{imgpath}}{{detail[1][-2]}}" alt="{{imgpath}}{{detail[1][-2]}}">
+  			<img src="{{imgpath}}{{detail[1][-2]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-2]}}">
 	    </td>
 	<tr>
   </table>
@@ -68,6 +70,6 @@
   	%end
   </table>
 </div>
-
+</div>
 
 %include ('./view/bsfiles/view/html_footer.tpl')

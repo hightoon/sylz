@@ -99,39 +99,6 @@
       </div>
     </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <!--script src="http://code.jquery.com/jquery-1.9.0.js"></script>
-    <script scr="/static/view/bsfiles/js/raphael.js"></script>
-    <script src="/static/view/bsfiles/js/morris.js-0.5.1/morris.js"></script-->
-    <!--script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-    <script src="http://cdn.oesmith.co.uk/morris-0.4.1.min.js"></script-->
-    <!--script src="/static/view/bsfiles/js/JSON-js-master/json2.js"></script-->
-    <!--script src="/static/view/bsfiles/js/raphael-min.js"></script>
-    <script src="/static/view/bsfiles/js/jquery-1.8.2.min.js"></script>
-    <script src="/static/view/bsfiles/js/morris-0.4.1.min.js"></script>
-    <script type="text/javascript">
-      var numofsite = {{numofsite}};
-      var sites = "{{sites}}".split('|');
-      var data = JSON.parse("{{stat}}");
-      var statdata = [];
-      for (var i = 0; i < 24; i++) {
-        d = {};
-        d['h'] = String(i)+':00';
-        for (var j = 0; j < numofsite; j++) {
-          d[sites[j]] = data[numofsite*i+j];
-        }
-        statdata.push(d);
-      }
-      Morris.Line({element: 'line-stat',
-        parseTime: false,
-        data: statdata,
-        xkey: 'h',
-        ykeys: sites,
-        labels: sites});
-    </script-->
     <script src="/static/view/bsfiles/js/jquery.min.js"></script>
     <script src="/static/view/bsfiles/js/bootstrap.min.js"></script>
 
