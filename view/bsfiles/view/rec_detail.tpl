@@ -7,7 +7,7 @@
   </div>
   <div class="panel-body">
   </div>
-  <table class="table table-bordered">
+  <table class="table-responsive table-bordered">
   	%for i in xrange(0, length, 2):
   		<tr>
     	%if (i==4 or i==10) and "danger" in panel_type:
@@ -30,13 +30,17 @@
 	<tr>
 	    <td>
 	    	<label>车头照片:&nbsp</label>
-  			<img src="{{imgpath}}{{detail[1][-3]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-3]}}">
+        <a href="{{imgpath}}{{detail[1][-3]}}" class="thumbnail">
+  			 <img src="{{imgpath}}{{detail[1][-3]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-3]}}">
+        </a>
 	    </td>
 	<!--/tr>
 	<tr-->
 	    <td>
 	    	<label>车尾照片:&nbsp</label>
-  			<img src="{{imgpath}}{{detail[1][-2]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-2]}}">
+        <a href="{{imgpath}}{{detail[1][-2]}}" class="thumbnail">
+  			 <img src="{{imgpath}}{{detail[1][-2]}}" width="500px" height="360px" alt="{{imgpath}}{{detail[1][-2]}}">
+        </a>
 	    </td>
 	<tr>
   </table>
@@ -45,7 +49,7 @@
   </div>
   <div class="panel-body">
   </div>
-  <table class="table table-bordered">
+  <table class="table-responsive table-bordered">
   	<tr>
   		%for item in history_recs[0]:
   			<th>{{item}}</th>

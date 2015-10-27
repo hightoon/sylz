@@ -26,6 +26,21 @@
 		        	  	value={{enddate}}>
 		        	  </div>
 		          </td>
+		          <td>
+	                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">时间段</label>
+	                  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
+	                  <select class="form-control input-sm" name="timeInterval">
+	                    <option value="" selected>全部</option>
+	                    %for hour in xrange(24): 
+	                    <option value="{{hour}}:00:00-{{hour}}:59:59">
+	                      {{hour}}:00:00-{{hour+1}}:00:00
+	                    </option>
+	                    %end
+	                  </select>
+	                  </div>
+                  </td>
+                </tr>
+		        <tr>
 	      	  	  <td>
 		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">超限状态</label>
 		      	  	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
@@ -46,8 +61,7 @@
 		        	  </select>
 		        	  </div>
 		          </td>
-		        </tr>
-		        <tr>
+		        
 		          <td>
 		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">处理状态</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
@@ -109,6 +123,8 @@
 		        	  </select>
 		        	  </div>
 	        	  </td>
+	        	</tr>
+	        	<tr>
 	        	  <td>
 		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车轴数</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
@@ -131,8 +147,6 @@
 		        	  </select>
 		        	  </div>
 	        	  </td>
-	        	</tr>
-	        	<tr>
 	        		<td>
 		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车牌号</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
@@ -162,6 +176,8 @@
 		        	  	</select>
 		        	  </div>
 	        	  	</td>
+	        	</tr>
+	        	<tr>
 	        	  	<td>
 		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车重</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
