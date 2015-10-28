@@ -173,9 +173,9 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
+    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
     #conn = pymssql.connect('192.168.0.7\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
-    conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
+    #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
 
