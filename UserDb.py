@@ -244,7 +244,8 @@ def del_role(rn):
 class Record(object):
   TAB_HDR = ('序号', '站点', '时间', '车牌号', '状态', '轴数', 
             '车速', '车重(吨)', '车道', '限载(吨)', '超限率(%)', '处理登记时间')
-  TAB_BRF_HDR = ('序号', '站点', '时间', '车牌号', '车重(吨)', '超限率', '处理状态')
+  TAB_BRF_HDR = ('序号', '站点', '时间', '车牌号', '轴数', '车重(吨)', '超限率', 
+                 '超限值(吨)', '处理状态')
 
   def __init__(self, seq, recid, siteid, ts, plate, state, wheels, speed, weight, 
                roadnum, wlimit, wlpercent, frntpic, bckpic):
