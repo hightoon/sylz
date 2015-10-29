@@ -13,13 +13,17 @@
 		  <th>序号</th>
 		  <th>站点</th>
 		  <th>总超限车次</th>
+		  <th>总车次</th>
 		</tr>
 	</thead>
 	<tbody>
 		%for i in xrange(numofsite):
+		  <tr>
 			<td>{{i+1}}</td>
 			<td>{{sites[i]}}</td>
 			<td>{{sum([res[sites[i]] for res in stat])}}</td>
+			<td>{{sum(percent[sites[i]])}}</td>
+		  </tr>
 		%end
 	</tbody>
   </table>
