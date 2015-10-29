@@ -30,7 +30,7 @@
                   <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点</label>
                   <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
                   <select class="form-control input-sm" name="SiteID" id="siteid">
-                  %if siteid == "":
+                  %if siteids:
                     %for id in siteids:
                       <option value={{id}}>{{id}}</option>
                     %end
