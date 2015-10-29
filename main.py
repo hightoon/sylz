@@ -290,10 +290,11 @@ def proceed():
   except:
     redirect('/login')
 
+  today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   return template('./view/bsfiles/view/rec_proceed.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="1",
+                  user=act_user, startdate=today,
+                  enddate=today, ReadFlag="1",
                   smState="", smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -364,10 +365,11 @@ def proc_appr():
   except:
     redirect('/login')
 
+  today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   return template('./view/bsfiles/view/proc_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="2",
+                  user=act_user, startdate=today,
+                  enddate=today, ReadFlag="2",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -464,10 +466,11 @@ def register():
   except:
     redirect('/login')
 
+  today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   return template('./view/bsfiles/view/proc_rec.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="3",
+                  user=act_user, startdate=today,
+                  enddate=today, ReadFlag="3",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -541,10 +544,11 @@ def regappr():
   except:
     redirect('/login')
 
+  today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   return template('./view/bsfiles/view/reg_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="4",
+                  user=act_user, startdate=today,
+                  enddate=today, ReadFlag="4",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
