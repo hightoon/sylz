@@ -200,10 +200,11 @@ def query():
     privs = UserDb.get_privilege(UserDb.get(act_user).role)
   except:
     redirect('/login')
+  today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   return template('./view/bsfiles/view/vehicle_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
-                  user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="",
+                  user=act_user, startdate=today,
+                  enddate=today, ReadFlag="",
                   smState="", smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -219,18 +220,20 @@ def send_query_results():
   except:
     redirect('/login')
 
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'smState=%s', 'smWheelCount=%d', 'SiteID=%d',
-            'VehicheCard=%s', 'smLimitWeightPercent>%d', 'smTotalWeight=%d')
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
-    value = request.forms.get(re.split('>|=', f)[0])
+    value = request.forms.get(re.split('>|=| like ', f)[0])
     try:
       if '.' in value: values[f] = float(value)
       else: values[f] = int(value)
     except:
       if value:
         if value == 'None': values[f] = None
-        else: values[f] = value.decode('utf-8')
+        else: 
+          values[f] = value.decode('utf-8')
   cond = cons_query_where_clause(values)
   interval = cons_query_interval(map(request.forms.get, ['startdate', 'enddate']))
   hourange = request.forms.get('timeInterval')
@@ -238,7 +241,7 @@ def send_query_results():
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
   print cond
-  results = db_man.fetch_cond_recs(cond, interval)
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
   return template('./view/bsfiles/view/vehicle_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
@@ -290,7 +293,7 @@ def proceed():
   return template('./view/bsfiles/view/rec_proceed.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="",
+                  enddate='2015-06-25 23:59:59', ReadFlag="1",
                   smState="", smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -321,8 +324,9 @@ def proceed_query():
   except:
     redirect('/login')
 
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 'smState=%s',
-            'VehicheCard=%s', 'smLimitWeightPercent>%d', 'smTotalWeight=%d')
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
     value = request.forms.get(re.split('=|>', f)[0])
@@ -339,7 +343,7 @@ def proceed_query():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  results = db_man.fetch_cond_recs(cond, interval)
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
   return template('./view/bsfiles/view/rec_proceed.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
@@ -363,7 +367,7 @@ def proc_appr():
   return template('./view/bsfiles/view/proc_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="",
+                  enddate='2015-06-25 23:59:59', ReadFlag="2",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -379,8 +383,9 @@ def proc_appr():
   except:
     redirect('/login')
 
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
-            'VehicheCard=%s', 'smLimitWeightPercent>%d', 'smTotalWeight=%d')
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
     value = request.forms.get(re.split('>|=', f)[0])
@@ -397,7 +402,7 @@ def proc_appr():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  results = db_man.fetch_cond_recs(cond, interval)
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
   return template('./view/bsfiles/view/proc_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
@@ -462,7 +467,7 @@ def register():
   return template('./view/bsfiles/view/proc_rec.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="",
+                  enddate='2015-06-25 23:59:59', ReadFlag="3",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -478,8 +483,9 @@ def register():
   except:
     redirect('/login')
 
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
-            'VehicheCard=%s', 'smLimitWeightPercent>%d', 'smTotalWeight=%d')
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
     value = request.forms.get(re.split('=|>', f)[0])
@@ -496,7 +502,7 @@ def register():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  results = db_man.fetch_cond_recs(cond, interval)
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
   return template('./view/bsfiles/view/proc_rec.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
@@ -538,7 +544,7 @@ def regappr():
   return template('./view/bsfiles/view/reg_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, startdate='2015-06-25 00:00:00',
-                  enddate='2015-06-25 23:59:59', ReadFlag="",
+                  enddate='2015-06-25 23:59:59', ReadFlag="4",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
@@ -554,8 +560,9 @@ def regappr():
   except:
     redirect('/login')
 
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
-            'VehicheCard=%s', 'smLimitWeightPercent>%d', 'smTotalWeight=%d')
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
     value = request.forms.get(re.split('=|>', f)[0])
@@ -572,7 +579,7 @@ def regappr():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  results = db_man.fetch_cond_recs(cond, interval)
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
   return template('./view/bsfiles/view/reg_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',

@@ -304,7 +304,7 @@ def fetch_recs(ow='', proc='', brf=True):
         else:
             return fetch_all_good()
 
-def fetch_cond_recs(cond, interval, brf=True):
+def fetch_cond_recs(cond, interval, brf=True, inplate=''):
     conn = connectdb()
     cur = conn.cursor()
 
@@ -338,13 +338,14 @@ def fetch_cond_recs(cond, interval, brf=True):
             for row in rows:
                 sn = '站点-%d'%(row['SiteID'])
                 if sites.has_key(row['SiteID']): sn = sites[row['SiteID']]
-                results.append((row['Xuhao'], sn, 
-                                datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
-                                row['VehicheCard'], row['smWheelCount'], 
-                                row['smTotalWeight']/1000,
-                                row['smLimitWeightPercent'], 
-                                get_ow_tons(row['smTotalWeight'], row['smLimitWeight']),
-                                status[row['ReadFlag']],))
+                if inplate in row['VehicheCard']:
+                    results.append((row['Xuhao'], sn, 
+                                    datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
+                                    row['VehicheCard'], row['smWheelCount'], 
+                                    row['smTotalWeight']/1000,
+                                    row['smLimitWeightPercent'], 
+                                    get_ow_tons(row['smTotalWeight'], row['smLimitWeight']),
+                                    status[row['ReadFlag']],))
         else:
             print 'fetch cond details'
             results = [UserDb.Record.TAB_HDR]
@@ -405,7 +406,7 @@ def query_detail_by_seq(seq):
 
 def query_history_by_plate(plate):
     "get record belongs to plate in the past 90 days"
-    tab_hdr = ('纪录编号', '站点', '时间', '车牌', '轴数', '超重', '超限率', '超限值(吨)')
+    tab_hdr = ('纪录编号', '站点', '时间', '车牌', '超重', '超限率',)
     if plate == u"无车牌": return False, [tab_hdr]
     conn = connectdb()
     cur = conn.cursor(as_dict=True)
@@ -431,9 +432,8 @@ def query_history_by_plate(plate):
         timestr = datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S')
         result.append(
             (row['RecordID'], sitename, timestr, 
-             row['VehicheCard'], row['smWheelCount'],
+             row['VehicheCard'],
              row['smState'], row['smLimitWeightPercent'],
-             get_ow_tons(row['smTotalWeight'], row['smLimitWeight']),
              row['Xuhao'],
              remote_plate_img, remote_rear_img, 
              row['ReadFlag'])
@@ -450,15 +450,15 @@ def period_stat(p, percent=False, siteid=None):
     cur = conn.cursor(as_dict=True)
     #startt = datetime.strftime(datetime.now(), '%Y-%m-%d') + ' 00:00:00'
     #endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-    where_str = ' AND smState=%s'
-    where_val = ['1']
+    where_str = ''
+    where_val = []
     if siteid:
         where_str += ' AND SiteID=%d'
         where_val.append(siteid)
 
     startt, endt = p
     timestr = " smTime between \'%s\' and \'%s\'"%(startt, endt)
-    cur.execute('SELECT * FROM smHighWayDate WHERE ' + timestr + where_str, tuple(where_val))
+    cur.execute('SELECT * FROM smHighWayDate WHERE ' + timestr + where_str + ' AND smState=%s', tuple(where_val+['1']))
     rows = cur.fetchall()
 
     # 24 hours results
@@ -484,8 +484,8 @@ def period_stat(p, percent=False, siteid=None):
             cur.execute('SELECT * FROM smHighWayDate WHERE ' + timestr + ' AND ' + percent_ranges[pr] + where_str, tuple(where_val))
             recs = cur.fetchall()
             for rec in recs:
-                try: sn = sites[row['SiteID']]
-                except: sn = '站点%d'%(row['SiteID'])
+                try: sn = sites[rec['SiteID']]
+                except: sn = '站点%d'%(rec['SiteID'])
                 if percent_results.has_key(sn): percent_results[sn][pr] += 1
                 else: 
                     percent_results[sn] = [0]*numofrange
@@ -515,7 +515,6 @@ def get_site_ids():
     cur = conn.cursor()
     cur.execute("SELECT SiteID FROM smSites")
     rows = cur.fetchall()
-    print rows
     if not rows:
         cur.execute("SELECT SiteID FROM smHighWayDate")
         rows = cur.fetchall()
@@ -605,18 +604,19 @@ def confirm_blacklist_state(seq):
 
 def test_main():
     conn = connectdb()
-    cur = conn.cursor()
+    cur = conn.cursor(as_dict=True)
     #exec_sql_file(cur, r'../sifang/sifang.sql')
-    #cur.execute('SELECT * FROM smHighWayDate WHERE VehicheCard=%s', '无车牌'.decode('utf-8'))
+    cur.execute('SELECT * FROM smHighWayDate WHERE VehicheCard LIKE \'%%\'')
     #cur.execute('SELECT * FROM smHighWayDate')
-    #for r in cur.fetchall():
-    #    print r
+    for r in cur.fetchall():
+        if '无'.decode('utf-8') in r['VehicheCard']:
+            print r['VehicheCard']
     #cur.execute('ALTER TABLE [dbo].[smHighWayDate] ADD ProcTime [datetime] NULL')
-    cur.execute('INSERT blacklist VALUES (%s, %s)', ('2015-08-30 13:23:08', u'浙A124FA'))
+    #cur.execute('INSERT blacklist VALUES (%s, %s)', ('2015-08-30 13:23:08', u'浙A124FA'))
     cur.close()
     conn.close()
 
 if __name__ == '__main__':
-    #test_main()
     get_param() 
+    test_main()
 
