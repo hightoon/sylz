@@ -153,7 +153,7 @@ def page_index():
                   #stat=json.dumps(stat), sites='|'.join(sites), 
                   #numofsite=numofsite, sites=sites, stat=results,
                   siteids=db_man.get_site_ids(), period=today,  #percent=percent_results,
-                  startdate="2015-06-25 00:00:00", enddate="2015-06-25 23:59:59", 
+                  startdate=today, enddate=today, 
                   siteid=db_man.get_site_ids()[0],
                   privs=privs)
 
