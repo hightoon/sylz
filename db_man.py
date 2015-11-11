@@ -173,8 +173,8 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
-    #conn = pymssql.connect('192.168.0.7\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
+    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
+    conn = pymssql.connect('192.168.0.11\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
     #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
@@ -374,6 +374,33 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
 
     return results
 
+def mquery_siteid(siteid):
+    import decimal
+    conn = connectdb()
+    cur = conn.cursor()
+
+    cur.execute('SELECT RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
+        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d', siteid)
+    results = []
+    keys = ('RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
+            'smLimitWeightPercent', 'smPlatePath', 'smImgPath')
+    rows = cur.fetchall()
+    for row in rows:
+        tmp = {}
+        for i in range(len(keys)):
+            if keys[i] == 'smTime':
+                tmp[keys[i]] = datetime.strftime(row[i], '%Y-%m-%d %H:%M:%S')
+            elif type(row[i]) == decimal.Decimal:
+                tmp[keys[i]] = str(row[i])
+            else:
+                try:
+                    tmp[keys[i]] = str(row[i].decode('utf8'))
+                except:
+                    tmp[keys[i]] = row[i]
+        results.append(tmp)
+    conn.close()
+    return results
+
 def query_detail_by_seq(seq):
     conn = connectdb()
     cur = conn.cursor(as_dict=True)
@@ -503,6 +530,14 @@ def get_site_name(siteid):
     conn.close()
     if sn is None: return '站点-%d'%(siteid)
     return sn['SiteName']
+
+def get_sites():
+    conn = connectdb()
+    cur = conn.cursor()
+    cur.execute('SELECT SiteID, SiteName FROM smSites')
+    sites = cur.fetchall()
+    conn.close()
+    return sites
 
 def get_site_name_cache(siteid, sites):
     for site in sites:

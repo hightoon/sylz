@@ -30,21 +30,9 @@
                   <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点</label>
                   <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
                   <select class="form-control input-sm" name="SiteID" id="siteid">
-                  %if siteids:
-                    %for id in siteids:
-                      <option value={{id}}>{{id}}</option>
+                    %for site in sitenames:
+                    <option value={{site[0]}}>{{site[1]}}</option>
                     %end
-                    <option value="" selected>全部</option>
-                  %else:
-                    %for id in siteids:
-                      %if str(id) == siteid:
-                      <option value={{id}} selected>{{id}}</option>
-                      %else:
-                      <option value={{id}}>{{id}}</option>
-                      %end
-                    %end
-                    <option value="">全部</option>
-                  %end
                   </select>
                   </div>
                 </td>
@@ -53,6 +41,9 @@
               <td>
                 <button type="submit" class="btn btn-md btn-primary" name="query" value="show">
                   查询
+                </button>
+                <button type="submit" class="btn btn-md btn-success" name="export" value="export">
+                  导出
                 </button>
               </td>
             </tr>

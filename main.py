@@ -153,7 +153,7 @@ def page_index():
                   #stat=json.dumps(stat), sites='|'.join(sites), 
                   #numofsite=numofsite, sites=sites, stat=results,
                   siteids=db_man.get_site_ids(), period=today,  #percent=percent_results,
-                  startdate=today, enddate=today, 
+                  startdate=today, enddate=today, sitenames=db_man.get_sites(),
                   siteid=db_man.get_site_ids()[0],
                   privs=privs)
 
@@ -183,13 +183,31 @@ def stat():
   sites = list(results[0].keys())
   numofsite = len(sites)
 
+  if request.forms.get('export'):
+    import csv
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+    exptime = datetime.strftime(datetime.now(), '%Y%m%dT%H%M%S')
+    csvname = 'tongji%s.csv'%exptime
+    with open(csvname, 'wb') as csvfile:
+      writer = csv.writer(csvfile, dialect='excel')
+      writer.writerow(('站点', '时段', '超限车次',))
+      for s in xrange(numofsite):
+        for h in xrange(24):
+          writer.writerow((sites[s], '%2d:00-%2d:00'%(h, h+1), results[h][sites[s]]))
+    return "<a href=\"/static/%s\">打开统计报告</a>"%csvname
+
   return template('./view/bsfiles/view/dashboard.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, query_results='./view/bsfiles/view/query_rslts.tpl',
-                  numofsite=numofsite, sites=sites, stat=results,
+                  numofsite=numofsite, sites=sites, stat=results, sitenames=db_man.get_sites(),
                   siteids=db_man.get_site_ids(), period=period, percent=percent_results,
                   startdate=startdate, enddate=enddate, siteid=siteid, 
                   privs=privs)
+
+@route('/statdata/export')
+def export():
+  return 'ok, data exported.'
 
 @route('/query')
 def query():
@@ -206,8 +224,8 @@ def query():
                   user=act_user, startdate=today,
                   enddate=today, ReadFlag="",
                   smState="", smLimitWeightPercent="",
-                  VehicheCard="", smTotalWeight="",
-                  smWheelCount="",
+                  VehicheCard="", smTotalWeight="", SiteID="",
+                  smWheelCount="", sites=db_man.get_sites(),
                   privs=privs, results=None)
 
 @route('/query', method="POST")
@@ -243,13 +261,15 @@ def send_query_results():
   print cond
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
+  
   return template('./view/bsfiles/view/vehicle_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, privs=privs, startdate=request.forms.get('startdate'),
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
-                  smWheelCount=request.forms.get('smWheelCount'),
+                  smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.get('SiteID'),
+                  sites=db_man.get_sites(),
                   results=results)
 
 @route('/details/<seq>')
@@ -297,7 +317,7 @@ def proceed():
                   enddate=today, ReadFlag="1",
                   smState="", smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
-                  smWheelCount="",
+                  smWheelCount="", SiteID="", sites=db_man.get_sites(),
                   privs=privs, results=None)
 
 @route('/proceed/<seq>')
@@ -353,6 +373,7 @@ def proceed_query():
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
+                  SiteID=request.forms.get('SiteID'), sites=db_man.get_sites(),
                   smWheelCount=request.forms.get('smWheelCount'))
 
 @route('/proceed_approval')
@@ -372,7 +393,7 @@ def proc_appr():
                   enddate=today, ReadFlag="2",
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
-                  smWheelCount="",
+                  smWheelCount="", SiteID="", sites=db_man.get_sites(),
                   privs=privs, results=None)
 
 @route('/proceed_approval', method='POST')
@@ -413,7 +434,8 @@ def proc_appr():
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
-                  smWheelCount=request.forms.get('smWheelCount'))
+                  smWheelCount=request.forms.get('smWheelCount'),
+                  SiteID=request.forms.get('SiteID'), sites=db_man.get_sites())
 
 @route('/approved/<seq>')
 def approved(seq):
@@ -474,6 +496,7 @@ def register():
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
+                  SiteID="", sites=db_man.get_sites(),
                   privs=privs, results=None)
 
 @route('/register', method='POST')
@@ -514,7 +537,8 @@ def register():
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
-                  smWheelCount=request.forms.get('smWheelCount'))
+                  smWheelCount=request.forms.get('smWheelCount'),
+                  SiteID=request.forms.get('SiteID'), sites=db_man.get_sites())
 
 @route('/register/<seq>', method='POST')
 def register(seq):
@@ -552,6 +576,7 @@ def regappr():
                   smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="",
                   smWheelCount="",
+                  SiteID="", sites=db_man.get_sites(),
                   privs=privs, results=None)
 
 @route('/reg_approval', method='POST')
@@ -592,7 +617,8 @@ def regappr():
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
-                  smWheelCount=request.forms.get('smWheelCount'))
+                  smWheelCount=request.forms.get('smWheelCount'),
+                  SiteID=request.forms.get('SiteID'), sites=db_man.get_sites())
 
 @route('/registered/<seq>')
 def regappr(seq):
@@ -692,7 +718,8 @@ def blappr():
   return template('./view/bsfiles/view/blacklist_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user,
-                  privs=privs, blist=db_man.get_blacklist())
+                  privs=privs, blist=[b for b in db_man.get_blacklist() 
+                                      if b[-1]!=UserDb.BlackList.APPROVED])
 
 @route('/disappr_blacklist/<seq>')
 def disappr(seq):
@@ -719,6 +746,11 @@ def disappr(seq):
 
   db_man.confirm_blacklist_state(seq)
   redirect('/blacklist_approval')
+
+#### restful api ####
+@route('/mquery/ow/<siteid>')
+def mquery_by_siteid(siteid):
+  return {'data': db_man.mquery_siteid(int(siteid))}
 
 @route('/add_role', method='POST')
 def add_role():
