@@ -7,7 +7,7 @@
   </div>
   <div class="panel-body">
   </div>
-  <table class="table table-bordered">
+  <table class="table-responsive table-bordered">
   	%for i in xrange(0, length, 2):
   		<tr>
     	%if (i==4 or i==10) and "danger" in panel_type:
@@ -49,7 +49,7 @@
   </div>
   <div class="panel-body">
   </div>
-  <table class="table table-bordered">
+  <table class="table-responsive table-bordered">
   	<tr>
   		%for item in history_recs[0]:
   			<th>{{item}}</th>

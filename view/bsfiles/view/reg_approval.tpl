@@ -92,13 +92,21 @@
 		        	  </div>
 	        	  </td>
 	        	  <td>
-		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点编号</label>
+		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
 		        	  <select class="form-control input-sm" name="SiteID" id="siteid">
-		        	  	%for i in xrange(1, 9):
-	        			<option value={{i}}>{{i}}</option>
+		        	  	%for site in sites:
+		        	  		%if SiteID==str(site[0]):
+	        				<option value={{site[0]}} selected>{{site[1]}}</option>
+	        				%else:
+	        				<option value={{site[0]}}>{{site[1]}}</option>
+	        				%end
 	        			%end
+	        			%if SiteID=="": 
 	        			<option value="" selected>全部</option>
+	        			%else:
+	        			<option value="">全部</option>
+	        			%end
 		        	  </select>
 		        	  </div>
 	        	  </td>
