@@ -7,6 +7,26 @@
       	%include ('./view/bsfiles/view/nav_sidebar.tpl')
       	<div class="col-xs-9 col-xs-offset-3 col-sm-9 col-sm-offset-3 
                     col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
+          <table class="table table-striped">
+          <tbody>
+            <form action="/blacklist_mng" method="POST">
+              <tr>
+                <td>
+                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车牌号</label>
+                  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
+                  <input type="text" class="form-control input-sm" id="plate" name="plate">
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                <button type="submit" class="btn btn-md btn-primary" name="query" value="show">查询</button>
+                </td>
+              </tr>
+            </form>
+          </tbody>
+          </table>
+          %if blist:
       	  <h3 class="sub-header">黑名单列表</h3>
       	    <table class="table table-striped">
               <thead>
@@ -46,6 +66,7 @@
 	           	 	%end
               </tbody>
             </table>
+          %end
           <h3 class="sub-header">添加黑名单</h3>
           	<form action="/request_black" method="POST">
               <td>

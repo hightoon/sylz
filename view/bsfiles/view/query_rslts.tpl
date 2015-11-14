@@ -3,9 +3,10 @@
   <div class="panel-heading">站点超限统计－{{period}}</div>
   <div class="panel-body"></div>
   <!-- Table -->
+  %if siteid=="":
   <h4 style="color:red;"><mark>站点超限总数</mark></h4>
   %if numofsite==0:
-  	<p class="lead">该站点无超限纪录！<br><br></p>
+  	<p class="lead">站点无超限纪录！<br><br></p>
   %else:
   <table class="table">
 	<thead>
@@ -26,11 +27,14 @@
 		  </tr>
 		%end
 	</tbody>
+	<span>注：仅显示存在超限纪录的站点。</span>
   </table>
   %end
+  %end
+  %if siteid!="":
   <h4 style="color:red;"><mark>站点超限分时段统计</mark></h4>
   %if numofsite==0:
-  	<p class="lead">该站点无超限纪录！<br><br></p>
+  	<p class="lead">站点无超限纪录！<br><br></p>
   %else:
   %for i in xrange(numofsite):
   	<span style="color: blue">{{sites[i]}}</span>
@@ -56,7 +60,7 @@
   %end
   <h4 style="color:red;"><mark>站点分时段超限率统计</mark></h4>
   %if numofsite==0:
-  	<p class="lead">该站点无超限纪录！<br><br></p>
+  	<p class="lead">站点无超限纪录！<br><br></p>
   %else:
   <table class="table">
 	<thead>
@@ -82,5 +86,6 @@
 		%end
 	</tbody>
   </table>
+  %end
   %end
 </div>
