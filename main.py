@@ -184,6 +184,8 @@ def stat():
   numofsite = len(sites)
 
   if request.forms.get('export'):
+    if siteid=="":
+      return "请选择需要导出数据的站点，选择全部无法导出站点数据!"
     import csv
     reload(sys)
     sys.setdefaultencoding('utf8')
@@ -650,6 +652,23 @@ def blquery():
                   user=act_user,
                   privs=privs, blist=db_man.get_blacklist())
 
+@route('/blacklist_query', method='POST')
+def blquery():
+  act_user = get_act_user()
+  if act_user is None:
+    redirect('/')
+  try:
+    privs = UserDb.get_privilege(UserDb.get(act_user).role)
+  except:
+    redirect('/login')
+
+  plate = request.forms.get('plate').decode('utf8')
+  allblack = db_man.get_blacklist()
+  return template('./view/bsfiles/view/blacklist_query.tpl',
+                  custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
+                  user=act_user,
+                  privs=privs, blist=[b for b in allblack if plate in b[1]])
+
 @route('/blacklist_mng')
 def blmng():
   act_user = get_act_user()
@@ -664,6 +683,23 @@ def blmng():
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user,
                   privs=privs, blist=db_man.get_blacklist())
+
+@route('/blacklist_mng', method='POST')
+def blmng():
+  act_user = get_act_user()
+  if act_user is None:
+    redirect('/')
+  try:
+    privs = UserDb.get_privilege(UserDb.get(act_user).role)
+  except:
+    redirect('/login')
+
+  plate = request.forms.get('plate').decode('utf8')
+  allblack = db_man.get_blacklist()
+  return template('./view/bsfiles/view/blacklist_mng.tpl',
+                  custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
+                  user=act_user,
+                  privs=privs, blist=[b for b in allblack if plate in b[1]])
 
 @route('/request_black', method='POST')
 def reqbl():

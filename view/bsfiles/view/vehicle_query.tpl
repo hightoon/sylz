@@ -219,7 +219,8 @@
 	          	    <td>{{col}}</td>
 	          	  %end
 	          	  <td>
-	          	  	<button type="button" class="btn btn-sm btn-primary" onclick="open_window('/details/{{res[0]}}');">
+	          	  	<button type="button" class="btn btn-sm btn-primary" 
+	          	  			onclick="open_window('/details/{{res[0]}}');">
 	          	  		查看详情
 	          	  	</button>
 	          	  </td>

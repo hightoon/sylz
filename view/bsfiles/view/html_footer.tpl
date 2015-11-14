@@ -6,7 +6,8 @@
     <script src="/static/view/bsfiles/js/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
     <script type="text/javascript">
     	function open_window(url) {
-    		window.open(url, "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=600, height=500");
+    		//window.open(url, "_blank", "toolbar=yes, scrollbars=yes, menubar=yes, status,resizable, top=500, left=500, //width=600, height=500");
+    		window.open(url);
     	}
 
     	//send asynchronous http request

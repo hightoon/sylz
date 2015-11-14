@@ -31,7 +31,16 @@
                   <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
                   <select class="form-control input-sm" name="SiteID" id="siteid">
                     %for site in sitenames:
+                    %if str(site[0])==siteid:
+                    <option value={{site[0]}} selected>{{site[1]}}</option>
+                    %else:
                     <option value={{site[0]}}>{{site[1]}}</option>
+                    %end
+                    %end
+                    %if siteid=="":
+                    <option value="" selected>全部</option>
+                    %else:
+                    <option value="">全部</option>
                     %end
                   </select>
                   </div>
