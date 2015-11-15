@@ -154,7 +154,7 @@ def page_index():
                   #numofsite=numofsite, sites=sites, stat=results,
                   siteids=db_man.get_site_ids(), period=today,  #percent=percent_results,
                   startdate=today, enddate=today, sitenames=db_man.get_sites(),
-                  siteid=db_man.get_site_ids()[0],
+                  siteid=db_man.get_site_ids()[0], 
                   privs=privs)
 
 @route('/statdata', method='POST')

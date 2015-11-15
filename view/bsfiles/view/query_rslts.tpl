@@ -3,7 +3,7 @@
   <div class="panel-heading">站点超限统计－{{period}}</div>
   <div class="panel-body"></div>
   <!-- Table -->
-  %if siteid=="":
+  %if siteid!="":
   <h4 style="color:red;"><mark>站点超限总数</mark></h4>
   %if numofsite==0:
   	<p class="lead">站点无超限纪录！<br><br></p>
@@ -27,11 +27,8 @@
 		  </tr>
 		%end
 	</tbody>
-	<span>注：仅显示存在超限纪录的站点。</span>
   </table>
   %end
-  %end
-  %if siteid!="":
   <h4 style="color:red;"><mark>站点超限分时段统计</mark></h4>
   %if numofsite==0:
   	<p class="lead">站点无超限纪录！<br><br></p>
@@ -87,5 +84,35 @@
 	</tbody>
   </table>
   %end
+  %else:
+  <h4 style="color:red;"><mark>站点超限总数</mark></h4>
+  <table class="table">
+	<thead>
+		<tr>
+		  <th>序号</th>
+		  <th>站点</th>
+		  <th>总超限车次</th>
+		  <th>总车次</th>
+		</tr>
+	</thead>
+	<tbody>
+		%for i in range(len(sitenames)):
+		  <tr>
+			<td>{{i+1}}</td>
+			<td>{{sitenames[i][1]}}</td>
+			%if stat[0].has_key(sitenames[i][1]):
+				<td>{{sum([res[sitenames[i][1]] for res in stat])}}</td>
+			%else:
+				<td>0</td>
+			%end
+			%if percent.has_key(sitenames[i][1]):
+				<td>{{sum(percent[sitenames[i][1]])}}</td>
+			%else:
+				<td>0</td>
+			%end
+		  </tr>
+		%end
+	</tbody>
+  </table>
   %end
 </div>

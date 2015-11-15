@@ -11,10 +11,8 @@
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{user}}</a></li>
-        <!--li><a href="#">设置</a></li>
-        <li><a href="/change_passwd">修改密码</a></li-->
-        <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> 退出登录</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>{{user}}</a></li>
+        <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span>退出</a></li>
       </ul>
     </div>
   </div>
