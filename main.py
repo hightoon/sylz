@@ -788,6 +788,15 @@ def disappr(seq):
 def mquery_by_siteid(siteid):
   return {'data': db_man.mquery_siteid(int(siteid))}
 
+@route('/mquery/detail/<seq>')
+def mquery_detail(seq):
+  return {'data': db_man.mquery_detail(int(seq))}
+
+@route('/mquery/history/<plate>')
+def mquery_history(plate):
+  print plate
+  return {'data': db_man.mquery_history(plate.decode('utf8'))}
+
 @route('/add_role', method='POST')
 def add_role():
   act_user = get_act_user()

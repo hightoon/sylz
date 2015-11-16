@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pymssql
+import pymssql, decimal
 import UserDb
 from datetime import datetime, date, timedelta
 from ftplib import FTP
@@ -375,14 +375,13 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
     return results
 
 def mquery_siteid(siteid):
-    import decimal
     conn = connectdb()
     cur = conn.cursor()
 
-    cur.execute('SELECT RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
+    cur.execute('SELECT Xuhao, RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
         smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d', siteid)
     results = []
-    keys = ('RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
+    keys = ('Xuhao', 'RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
             'smLimitWeightPercent', 'smPlatePath', 'smImgPath')
     rows = cur.fetchall()
     for row in rows:
@@ -398,6 +397,52 @@ def mquery_siteid(siteid):
                 except:
                     tmp[keys[i]] = row[i]
         results.append(tmp)
+    conn.close()
+    return results
+
+def mquery_detail(seq):
+    conn = connectdb()
+    cur = conn.cursor(as_dict=True)
+
+    cur.execute('SELECT Xuhao, SiteID, smTime, VehicheCard, smState, smWheelCount, \
+                 smSpeed, smTotalWeight, smRoadNum, smLimitWeight, smLimitWeightPercent,\
+                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate WHERE Xuhao=%d', seq)
+    rows = cur.fetchall()
+    results = []
+    for row in rows:
+        for k in row.keys():
+            if k == 'smTime':
+                row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
+            elif type(row[k]) == decimal.Decimal:
+                row[k] = str(row[k])
+            else:
+                try: row[k] = str(row[k].decode('utf8'))
+                except: pass
+        results.append(row)
+    conn.close()
+    return results
+
+def mquery_history(plate):
+    conn = connectdb()
+    cur = conn.cursor(as_dict=True)
+
+    cur.execute('SELECT Xuhao, SiteID, smTime, VehicheCard, smState, smWheelCount, \
+                 smSpeed, smTotalWeight, smRoadNum, smLimitWeight, smLimitWeightPercent,\
+                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate')
+    rows = cur.fetchall()
+    results = []
+    for row in rows:
+        if plate not in row['VehicheCard']:
+            continue
+        for k in row.keys():
+            if k == 'smTime':
+                row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
+            elif type(row[k]) == decimal.Decimal:
+                row[k] = str(row[k])
+            else:
+                try: row[k] = str(row[k].decode('utf8'))
+                except: pass
+        results.append(row)
     conn.close()
     return results
 
