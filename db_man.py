@@ -378,8 +378,13 @@ def mquery_siteid(siteid):
     conn = connectdb()
     cur = conn.cursor()
 
+    startt = datetime.strftime(datetime.now() - timedelta(hours=1), '%Y-%m-%d %H:%M:%S')
+    endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+    pstr = " AND smTime between \'%s\' and \'%s\'"%(startt, endt)
+
     cur.execute('SELECT Xuhao, RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
-        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d', siteid)
+        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d'+pstr, 
+        siteid)
     results = []
     keys = ('Xuhao', 'RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
             'smLimitWeightPercent', 'smPlatePath', 'smImgPath')
