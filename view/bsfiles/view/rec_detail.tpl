@@ -44,6 +44,7 @@
 	    </td>
 	<tr>
   </table>
+  %if history_recs is not None:
   <div class="panel-heading panel-warning">
     <h4 class="panel-title">历史信息</h4>
   </div>
@@ -73,6 +74,7 @@
   		</tr>
   	%end
   </table>
+  %end
 </div>
 </div>
 

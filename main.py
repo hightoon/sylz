@@ -114,6 +114,20 @@ def do_login():
   else:
     redirect('/')
 
+@route('/mlogin', method='GET')
+def do_login():
+  usrname = request.GET.get('usrname')
+  passwd = request.GET.get('passwd')
+
+  print usrname, passwd
+
+  isvalid, user = validate_from_db(usrname, passwd)
+  if isvalid:
+    set_act_user(usrname)
+    return {'response': 'ok'}
+  else:
+    return {'response': 'error'}
+
 @route('/logout')
 def logout():
   request.session.delete()
@@ -786,16 +800,67 @@ def disappr(seq):
 #### restful api ####
 @route('/mquery/ow/<siteid>')
 def mquery_by_siteid(siteid):
+  act_user = get_act_user()
+  if act_user is None:
+    return {'data': 'error'}
   return {'data': db_man.mquery_siteid(int(siteid))}
 
 @route('/mquery/detail/<seq>')
 def mquery_detail(seq):
+  act_user = get_act_user()
+  if act_user is None:
+    return {'data': 'error'}
   return {'data': db_man.mquery_detail(int(seq))}
 
 @route('/mquery/history/<plate>')
 def mquery_history(plate):
-  print plate
+  act_user = get_act_user()
+  if act_user is None:
+    return {'data': 'error'}
   return {'data': db_man.mquery_history(plate.decode('utf8'))}
+
+@route('/mquery/isblack/<plate>')
+def isblack(plate):
+  act_user = get_act_user()
+  if act_user is None:
+    return {'data': 'error'}
+  res = 'no'
+  if db_man.is_black(plate):
+    res = 'yes'
+  return {'data': res}
+
+@route('/extern_query')
+def exquery():
+  return template('./view/bsfiles/view/extern_query.tpl', 
+                  custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
+                  user=None,
+                  VehicheCard='',
+                  results=None)
+
+@route('/extern_query', method='POST')
+def exquery():
+  print 'extern post'
+  plate = request.forms.get('VehicheCard')
+  results = db_man.ext_query_all(plate)
+  return template('./view/bsfiles/view/extern_query.tpl', 
+                  custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
+                  user=None,
+                  VehicheCard=plate,
+                  results=results)
+
+@route('/ext/details/<seq>')
+def detail(seq):
+  imgpath = db_man.fpth
+  detail = db_man.query_detail_by_seq(int(seq))
+  panel = "panel-info"
+  if detail[1][4] == '1': panel = 'panel-danger'
+  isblack, history_recs = db_man.query_history_by_plate(detail[-1][3])
+  print isblack, history_recs, imgpath
+  return template('./view/bsfiles/view/rec_detail.tpl', 
+                   custom_hdr=None, panel_type=panel,
+                  detail=detail, length=len(detail[0]),
+                  isblack=isblack, history_recs=None, 
+                  imgpath=imgpath)
 
 @route('/add_role', method='POST')
 def add_role():

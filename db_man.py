@@ -173,8 +173,8 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
-    conn = pymssql.connect('192.168.0.11\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
+    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
+    #conn = pymssql.connect('192.168.0.6\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
     #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
@@ -372,6 +372,25 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
     else:
         results = None
 
+    return results
+
+def ext_query_all(plate):
+    conn = connectdb()
+    cur = conn.cursor(as_dict=True)
+
+    cur.execute('SELECT Xuhao, RecordID, SiteID, VehicheCard, \
+                 smTotalWeight, smLimitWeight, smLimitWeightPercent,\
+                 ReadFlag, ProcTime FROM smHighWayDate WHERE smState=%s', '1')
+    rows = cur.fetchall()
+    results = [('记录编号', '站点', '车牌号', '车重', '超重', '超限率', '处理状态', '处理时间')]
+    for row in rows:
+        print row['VehicheCard']
+        if plate.decode('utf8') in row['VehicheCard'] and (row['ReadFlag']==2 or row['ReadFlag']==4):
+            results.append((row['Xuhao'], row['RecordID'], get_site_name(row['SiteID']),
+                           row['VehicheCard'], row['smTotalWeight'], row['smLimitWeight'],
+                           row['smLimitWeightPercent'], status[row['ReadFlag']], 
+                           row['ProcTime']))
+    conn.close()
     return results
 
 def mquery_siteid(siteid):
@@ -636,6 +655,14 @@ def get_blacklist():
             res.append((row['SeqNum'], row['Plate'], row['Time'], row['State']))
     conn.close()
     return res
+
+def is_black(plate):
+    conn = connectdb()
+    cur = conn.cursor()
+    cur.execute('SELECT Plate from blacklist')
+    rows = cur.fetchall()
+    black = [row[0] for row in rows]
+    return (plate.decode('utf8') in black)
 
 def update_blacklist_state(seq, state):
     conn = connectdb()
