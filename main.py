@@ -1074,7 +1074,7 @@ def main():
   #websvr = Process(target=run, args=(app, 'wsgiref', '0.0.0.0', '8081'))
   #websvr.start()
   #websvr.join()
-  run(app, host='0.0.0.0', port=8081, server='cherrypy')
+  run(app, host='0.0.0.0', port=8081, server='cherrypy', debug=True)
   #run(app, host='0.0.0.0', port=8081)
 
 

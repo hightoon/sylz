@@ -321,16 +321,18 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
         startt = datetime.strftime(datetime.now(), '%Y-%m-%d') + ' 00:00:00'
         endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
 
+    order = ' ORDER BY smTime DESC'
+
     #if interval:
     timestr = " smTime between \'%s\' and \'%s\'"%(startt, endt)
     #else: timestr = ''
     if cond[0]:
         if timestr: timestr = ' and ' + timestr
-        cur.execute('SELECT * FROM smHighWayDate WHERE ' + cond[0] + timestr, cond[1])
+        cur.execute('SELECT * FROM smHighWayDate WHERE ' + cond[0] + timestr + order, cond[1])
     else:
         if timestr: timestr = ' WHERE ' + timestr
         print timestr
-        cur.execute('SELECT * FROM smHighWayDate' + timestr)
+        cur.execute('SELECT * FROM smHighWayDate' + timestr + order)
     rows = cur.fetchall()
     if rows:
         if brf:
@@ -384,7 +386,6 @@ def ext_query_all(plate):
     rows = cur.fetchall()
     results = [('记录编号', '站点', '车牌号', '车重', '超重', '超限率', '处理状态', '处理时间')]
     for row in rows:
-        print row['VehicheCard']
         if plate.decode('utf8') in row['VehicheCard'] and (row['ReadFlag']==2 or row['ReadFlag']==4):
             results.append((row['Xuhao'], row['RecordID'], get_site_name(row['SiteID']),
                            row['VehicheCard'], row['smTotalWeight'], row['smLimitWeight'],
@@ -400,9 +401,10 @@ def mquery_siteid(siteid):
     startt = datetime.strftime(datetime.now() - timedelta(hours=1), '%Y-%m-%d %H:%M:%S')
     endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
     pstr = " AND smTime between \'%s\' and \'%s\'"%(startt, endt)
+    order = ' ORDER BY smTime DESC'
 
     cur.execute('SELECT Xuhao, RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
-        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d'+pstr, 
+        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d'+pstr+order, 
         siteid)
     results = []
     keys = ('Xuhao', 'RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
@@ -452,7 +454,7 @@ def mquery_history(plate):
 
     cur.execute('SELECT Xuhao, SiteID, smTime, VehicheCard, smState, smWheelCount, \
                  smSpeed, smTotalWeight, smRoadNum, smLimitWeight, smLimitWeightPercent,\
-                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate')
+                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate ORDER BY smTime DESC')
     rows = cur.fetchall()
     results = []
     for row in rows:
@@ -509,7 +511,8 @@ def query_history_by_plate(plate):
     startt = datetime.strftime(date.today() - timedelta(days=90), '%Y-%m-%d') + ' 00:00:00'
     endt = datetime.strftime(date.today(), '%Y-%m-%d') + ' 23:59:59'
     pstr = " AND smTime between \'%s\' and \'%s\'"%(startt, endt)
-    cur.execute('SELECT * FROM smHighWayDate WHERE VehicheCard=%s'+pstr, plate)
+    order = ' ORDER BY smTime DESC'
+    cur.execute('SELECT * FROM smHighWayDate WHERE VehicheCard=%s'+pstr+order, plate)
     result = [tab_hdr]
     rows = cur.fetchall()
     cur.execute('SELECT * FROM blacklist WHERE Plate=%s', plate)
