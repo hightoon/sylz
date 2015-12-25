@@ -119,8 +119,6 @@ def do_login():
   usrname = request.GET.get('usrname')
   passwd = request.GET.get('passwd')
 
-  print usrname, passwd
-
   isvalid, user = validate_from_db(usrname, passwd)
   if isvalid:
     set_act_user(usrname)
@@ -800,30 +798,18 @@ def disappr(seq):
 #### restful api ####
 @route('/mquery/ow/<siteid>')
 def mquery_by_siteid(siteid):
-  act_user = get_act_user()
-  if act_user is None:
-    return {'data': 'error'}
   return {'data': db_man.mquery_siteid(int(siteid))}
 
 @route('/mquery/detail/<seq>')
 def mquery_detail(seq):
-  act_user = get_act_user()
-  if act_user is None:
-    return {'data': 'error'}
   return {'data': db_man.mquery_detail(int(seq))}
 
 @route('/mquery/history/<plate>')
 def mquery_history(plate):
-  act_user = get_act_user()
-  if act_user is None:
-    return {'data': 'error'}
   return {'data': db_man.mquery_history(plate.decode('utf8'))}
 
 @route('/mquery/isblack/<plate>')
 def isblack(plate):
-  act_user = get_act_user()
-  if act_user is None:
-    return {'data': 'error'}
   res = 'no'
   if db_man.is_black(plate):
     res = 'yes'
