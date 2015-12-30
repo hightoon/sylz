@@ -36,21 +36,21 @@ status = {
 }
 
 init_db_cmds = [
-    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[LimitW]') and 
+    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[LimitW]') and
         OBJECTPROPERTY(id, N'IsUserTable') = 1)
         drop table [dbo].[LimitW]""",
-    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smArea]') and 
+    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smArea]') and
         OBJECTPROPERTY(id, N'IsUserTable') = 1)
         drop table [dbo].[smArea]""",
-    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smHighWayDate]') and 
+    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smHighWayDate]') and
         OBJECTPROPERTY(id, N'IsUserTable') = 1)
         drop table [dbo].[smHighWayDate]
     """,
-    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smSites]') and 
+    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smSites]') and
         OBJECTPROPERTY(id, N'IsUserTable') = 1)
         drop table [dbo].[smSites]
     """,
-    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[blacklist]') and 
+    """ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[blacklist]') and
         OBJECTPROPERTY(id, N'IsUserTable') = 1)
         drop table [dbo].[blacklist]
     """
@@ -104,7 +104,7 @@ setup_db_cmds = [
     """,
     """ if not exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[smSites]'))
         CREATE TABLE [dbo].[smSites] (
-        [ID] [int] IDENTITY (1, 1) NOT NULL ,   
+        [ID] [int] IDENTITY (1, 1) NOT NULL ,
         [SiteID] [int] NULL ,
         [SiteName] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,
         [SiteInfo] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL
@@ -120,11 +120,18 @@ setup_db_cmds = [
     """
 ]
 
+def create_dir(fp):
+    dir = '/'.join(fp.split('/')[:-1])
+    try:
+        os.makedirs(dir)
+    except:
+        pass
+
 def retr_img_from_ftp(filename):
-    import os
     usr, passwd = user, pswd
     ret = True
-    localfn = filename.replace('/', '_')
+    create_dir(filename)
+    localfn = filename
     with open(localfn, 'wb') as lf:
         try:
             ftp = FTP(host, timeout=0.1)
@@ -253,8 +260,8 @@ def fetch_all_bad_brf(n):
     rows = cur.fetchall()
     if rows:
         for row in rows:
-            results.append((row['Xuhao'], get_site_name(row['SiteID']), 
-                            datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
+            results.append((row['Xuhao'], get_site_name(row['SiteID']),
+                            datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'),
                             row['VehicheCard'], row['smTotalWeight']/1000,
                             row['smLimitWeightPercent'], status[row['ReadFlag']],))
     conn.close()
@@ -341,11 +348,11 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
                 sn = '站点-%d'%(row['SiteID'])
                 if sites.has_key(row['SiteID']): sn = sites[row['SiteID']]
                 if inplate in row['VehicheCard']:
-                    results.append((row['Xuhao'], sn, 
-                                    datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
-                                    row['VehicheCard'], row['smWheelCount'], 
+                    results.append((row['Xuhao'], sn,
+                                    datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'),
+                                    row['VehicheCard'], row['smWheelCount'],
                                     row['smTotalWeight']/1000,
-                                    row['smLimitWeightPercent'], 
+                                    row['smLimitWeightPercent'],
                                     get_ow_tons(row['smTotalWeight'], row['smLimitWeight']),
                                     status[row['ReadFlag']],))
         else:
@@ -363,11 +370,11 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
                                  datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'),
                                  row['VehicheCard'], row['smTotalWeight']/1000,
                                  row['smLimitWeightPercent'], status[row['ReadFlag']],),
-                                (row['Xuhao'], get_site_name(row['SiteID']), datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'), 
+                                (row['Xuhao'], get_site_name(row['SiteID']), datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S'),
                                  row['VehicheCard'],
                                  row['smState'], row['smWheelCount'], row['smSpeed'], row['smTotalWeight']/1000,
                                  row['smRoadNum'], row['smLimitWeight']/1000, row['smLimitWeightPercent'], proctime,
-                                 row['smPlatePath'].replace(r'\\', '/'), row['smImgPath'].replace(r'\\', '/'), 
+                                 row['smPlatePath'].replace(r'\\', '/'), row['smImgPath'].replace(r'\\', '/'),
                                  row['ReadFlag'])
                               )
                             )
@@ -389,7 +396,7 @@ def ext_query_all(plate):
         if plate.decode('utf8') in row['VehicheCard'] and (row['ReadFlag']==2 or row['ReadFlag']==4):
             results.append((row['Xuhao'], row['RecordID'], get_site_name(row['SiteID']),
                            row['VehicheCard'], row['smTotalWeight'], row['smLimitWeight'],
-                           row['smLimitWeightPercent'], status[row['ReadFlag']], 
+                           row['smLimitWeightPercent'], status[row['ReadFlag']],
                            row['ProcTime']))
     conn.close()
     return results
@@ -404,7 +411,7 @@ def mquery_siteid(siteid):
     order = ' ORDER BY smTime DESC'
 
     cur.execute('SELECT Xuhao, RecordID, smTime, SiteID, VehicheCard, smTotalWeight, \
-        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d'+pstr+order, 
+        smLimitWeight, smLimitWeightPercent, smPlatePath, smImgPath FROM smHighWayDate WHERE SiteID=%d'+pstr+order,
         siteid)
     results = []
     keys = ('Xuhao', 'RecordID', 'smTime', 'SiteID', 'VehicheCard', 'smTotalWeight', 'smLimitWeight',
@@ -493,11 +500,11 @@ def query_detail_by_seq(seq):
     sitename = get_site_name(row['SiteID'])
     timestr = datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S')
     result.append(
-        (row['Xuhao'], sitename, timestr, 
+        (row['Xuhao'], sitename, timestr,
          row['VehicheCard'],
          row['smState'], row['smWheelCount'], row['smSpeed'], row['smTotalWeight']/1000,
          row['smRoadNum'], row['smLimitWeight']/1000, row['smLimitWeightPercent'], proctime,
-         remote_plate_img, remote_rear_img, 
+         remote_plate_img, remote_rear_img,
          row['ReadFlag'])
         )
     return result
@@ -530,11 +537,11 @@ def query_history_by_plate(plate):
         sitename = get_site_name(row['SiteID'])
         timestr = datetime.strftime(row['smTime'], '%Y-%m-%d %H:%M:%S')
         result.append(
-            (row['RecordID'], sitename, timestr, 
+            (row['RecordID'], sitename, timestr,
              row['VehicheCard'],
              row['smState'], row['smLimitWeightPercent'],
              row['Xuhao'],
-             remote_plate_img, remote_rear_img, 
+             remote_plate_img, remote_rear_img,
              row['ReadFlag'])
             )
     return (black is not None, result)
@@ -574,8 +581,8 @@ def period_stat(p, percent=False, siteid=None):
 
     percent_results = {}
     if percent:
-        percent_ranges = ['smLimitWeightPercent=0', 'smLimitWeightPercent>0 and smLimitWeightPercent<20', 
-                          'smLimitWeightPercent>=20 and smLimitWeightPercent<50', 
+        percent_ranges = ['smLimitWeightPercent=0', 'smLimitWeightPercent>0 and smLimitWeightPercent<20',
+                          'smLimitWeightPercent>=20 and smLimitWeightPercent<50',
                           'smLimitWeightPercent>=50 and smLimitWeightPercent<100',
                           'smLimitWeightPercent>=100']
         numofrange = len(percent_ranges)
@@ -586,7 +593,7 @@ def period_stat(p, percent=False, siteid=None):
                 try: sn = sites[rec['SiteID']]
                 except: sn = '站点%d'%(rec['SiteID'])
                 if percent_results.has_key(sn): percent_results[sn][pr] += 1
-                else: 
+                else:
                     percent_results[sn] = [0]*numofrange
                     percent_results[sn][pr] += 1
 
@@ -637,7 +644,7 @@ def get_ow_tons(total, limit):
 def update_read_flag(seq, value):
     conn = connectdb()
     cur = conn.cursor()
-    cur.execute('UPDATE smHighWayDate SET ReadFlag=%d, ProcTime=CAST(%s AS DATETIME) WHERE Xuhao=%d', 
+    cur.execute('UPDATE smHighWayDate SET ReadFlag=%d, ProcTime=CAST(%s AS DATETIME) WHERE Xuhao=%d',
                 (value, datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S'), seq))
     conn.close()
 
@@ -687,7 +694,7 @@ def approve_blacklist(seq):
 def add_blacklist(plate):
     conn = connectdb()
     cur = conn.cursor()
-    cur.execute('INSERT blacklist VALUES (CAST (%s AS DATETIME), %s, %d)', 
+    cur.execute('INSERT blacklist VALUES (CAST (%s AS DATETIME), %s, %d)',
         (datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S'), plate, UserDb.BlackList.REQUESTING))
     conn.close()
 
@@ -732,6 +739,5 @@ def test_main():
     conn.close()
 
 if __name__ == '__main__':
-    get_param() 
+    get_param()
     test_main()
-

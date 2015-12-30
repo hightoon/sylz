@@ -162,11 +162,11 @@ def page_index():
                   user=act_user, #query_results='./view/bsfiles/view/query_rslts.tpl',
                   query_results=None,
                   #results=db_man.fetch_all_bad_brf(30),
-                  #stat=json.dumps(stat), sites='|'.join(sites), 
+                  #stat=json.dumps(stat), sites='|'.join(sites),
                   #numofsite=numofsite, sites=sites, stat=results,
                   siteids=db_man.get_site_ids(), period=today,  #percent=percent_results,
                   startdate=today, enddate=today, sitenames=db_man.get_sites(),
-                  siteid=db_man.get_site_ids()[0], 
+                  siteid=db_man.get_site_ids()[0],
                   privs=privs)
 
 @route('/statdata', method='POST')
@@ -216,7 +216,7 @@ def stat():
                   user=act_user, query_results='./view/bsfiles/view/query_rslts.tpl',
                   numofsite=numofsite, sites=sites, stat=results, sitenames=db_man.get_sites(),
                   siteids=db_man.get_site_ids(), period=period, percent=percent_results,
-                  startdate=startdate, enddate=enddate, siteid=siteid, 
+                  startdate=startdate, enddate=enddate, siteid=siteid,
                   privs=privs)
 
 @route('/statdata/export')
@@ -264,7 +264,7 @@ def send_query_results():
     except:
       if value:
         if value == 'None': values[f] = None
-        else: 
+        else:
           values[f] = value.decode('utf-8')
   cond = cons_query_where_clause(values)
   interval = cons_query_interval(map(request.forms.get, ['startdate', 'enddate']))
@@ -275,7 +275,7 @@ def send_query_results():
   print cond
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
-  
+
   return template('./view/bsfiles/view/vehicle_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, privs=privs, startdate=request.forms.get('startdate'),
@@ -308,10 +308,10 @@ def show_detail(seq):
   if detail[1][4] == '1': panel = 'panel-danger'
   isblack, history_recs = db_man.query_history_by_plate(detail[-1][3])
   print isblack, history_recs, imgpath
-  return template('./view/bsfiles/view/rec_detail.tpl', 
+  return template('./view/bsfiles/view/rec_detail.tpl',
                    custom_hdr=None, panel_type=panel,
                   detail=detail, length=len(detail[0]),
-                  isblack=isblack, history_recs=history_recs, 
+                  isblack=isblack, history_recs=history_recs,
                   imgpath=imgpath)
 
 @route('/proceed')
@@ -421,7 +421,7 @@ def proc_appr():
     redirect('/login')
 
   inplate = request.forms.get('VehicheCard').decode('utf-8')
-  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
+  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d',
             'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
@@ -524,7 +524,7 @@ def register():
     redirect('/login')
 
   inplate = request.forms.get('VehicheCard').decode('utf-8')
-  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
+  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d',
             'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
@@ -604,7 +604,7 @@ def regappr():
     redirect('/login')
 
   inplate = request.forms.get('VehicheCard').decode('utf-8')
-  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d', 
+  fields = ('ReadFlag=%d', 'SiteID=%d', 'smWheelCount=%d',
             'smLimitWeightPercent>%d', 'smTotalWeight>%d')
   values = {}
   for f in fields:
@@ -766,7 +766,7 @@ def blappr():
   return template('./view/bsfiles/view/blacklist_approval.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user,
-                  privs=privs, blist=[b for b in db_man.get_blacklist() 
+                  privs=privs, blist=[b for b in db_man.get_blacklist()
                                       if b[-1]!=UserDb.BlackList.APPROVED])
 
 @route('/disappr_blacklist/<seq>')
@@ -817,7 +817,7 @@ def isblack(plate):
 
 @route('/extern_query')
 def exquery():
-  return template('./view/bsfiles/view/extern_query.tpl', 
+  return template('./view/bsfiles/view/extern_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=None,
                   VehicheCard='',
@@ -828,7 +828,7 @@ def exquery():
   print 'extern post'
   plate = request.forms.get('VehicheCard')
   results = db_man.ext_query_all(plate)
-  return template('./view/bsfiles/view/extern_query.tpl', 
+  return template('./view/bsfiles/view/extern_query.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=None,
                   VehicheCard=plate,
@@ -838,15 +838,18 @@ def exquery():
 def detail(seq):
   imgpath = db_man.fpth
   detail = db_man.query_detail_by_seq(int(seq))
+  #images have to be retrieved from sever for external user
+  db_man.retr_img_from_ftp(detail[-2])
+  db_man.retr_img_from_ftp(detail[-3])
   panel = "panel-info"
   if detail[1][4] == '1': panel = 'panel-danger'
   isblack, history_recs = db_man.query_history_by_plate(detail[-1][3])
   print isblack, history_recs, imgpath
-  return template('./view/bsfiles/view/rec_detail.tpl', 
+  return template('./view/bsfiles/view/rec_detail.tpl',
                    custom_hdr=None, panel_type=panel,
                   detail=detail, length=len(detail[0]),
-                  isblack=isblack, history_recs=None, 
-                  imgpath=imgpath)
+                  isblack=isblack, history_recs=None,
+                  imgpath='/static/')
 
 @route('/add_role', method='POST')
 def add_role():
