@@ -446,6 +446,12 @@ def mquery_detail(seq):
         for k in row.keys():
             if k == 'smTime':
                 row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
+            elif k == 'smPlatePath':
+                row[k] = row[k].replace(r'\\', '/')
+                retr_img_from_ftp(row[k])
+            elif k == 'smImgPath':
+                row[k] = row[k].replace(r'\\', '/')
+                retr_img_from_ftp(row[k])
             elif type(row[k]) == decimal.Decimal:
                 row[k] = str(row[k])
             else:
@@ -470,12 +476,6 @@ def mquery_history(plate):
         for k in row.keys():
             if k == 'smTime':
                 row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
-            elif k == 'smPlatePath':
-                row[k] = row[k].replace(r'\\', '/')
-                retr_img_from_ftp(row[k])
-            elif k == 'smImgPath':
-                row[k] = row[k].replace(r'\\', '/')
-                retr_img_from_ftp(row[k])
             elif type(row[k]) == decimal.Decimal:
                 row[k] = str(row[k])
             else:
