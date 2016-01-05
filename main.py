@@ -839,8 +839,8 @@ def detail(seq):
   imgpath = db_man.fpth
   detail = db_man.query_detail_by_seq(int(seq))
   #images have to be retrieved from sever for external user
-  db_man.retr_img_from_ftp(detail[-2])
-  db_man.retr_img_from_ftp(detail[-3])
+  db_man.retr_img_from_ftp(detail[-1][-2])
+  db_man.retr_img_from_ftp(detail[-1][-3])
   panel = "panel-info"
   if detail[1][4] == '1': panel = 'panel-danger'
   isblack, history_recs = db_man.query_history_by_plate(detail[-1][3])
