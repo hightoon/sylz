@@ -180,9 +180,9 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
+    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
     #conn = pymssql.connect('192.168.0.6\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
-    #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
+    conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
 
@@ -476,17 +476,21 @@ def mquery_detail(seq):
     return results
 
 def mquery_history(plate):
+    startt = datetime.strftime(datetime.now() - timedelta(days=90), '%Y-%m-%d %H:%M:%S')
+    endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+    pstr = " AND smTime between \'%s\' and \'%s\'"%(startt, endt)
+    order = ' ORDER BY smTime DESC'
+
     conn = connectdb()
     cur = conn.cursor(as_dict=True)
 
-    cur.execute('SELECT Xuhao, SiteID, smTime, VehicheCard, smState, smWheelCount, \
+    cur.execute("SELECT Xuhao, SiteID, smTime, VehicheCard, smState, smWheelCount, \
                  smSpeed, smTotalWeight, smRoadNum, smLimitWeight, smLimitWeightPercent,\
-                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate ORDER BY smTime DESC')
+                 smPlatePath, smImgPath, ReadFlag FROM smHighWayDate \
+                 WHERE VehicheCard LIKE '%%%s%%'"%plate.encode('utf8') + pstr + order)
     rows = cur.fetchall()
     results = []
     for row in rows:
-        if plate not in row['VehicheCard']:
-            continue
         for k in row.keys():
             if k == 'smTime':
                 row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
