@@ -401,6 +401,20 @@ def ext_query_all(plate):
     conn.close()
     return results
 
+def recs_in_half_min(siteid):
+    conn = connectdb()
+    cur = conn.cursor()
+
+    startt = datetime.strftime(datetime.now() - timedelta(seconds=30), '%Y-%m-%d %H:%M:%S')
+    endt = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+    pstr = " AND smTime between \'%s\' and \'%s\'"%(startt, endt)
+
+    cur.execute('SELECT Xuhao FROM smHighWayDate WHERE SiteID=%d AND smState=%s'+pstr, (siteid, '1',))
+    recs = cur.fetchall()
+    conn.close()
+    if recs: return 1
+    else: return 0
+
 def mquery_siteid(siteid):
     conn = connectdb()
     cur = conn.cursor()

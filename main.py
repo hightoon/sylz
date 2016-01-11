@@ -798,7 +798,7 @@ def disappr(seq):
 #### restful api ####
 @route('/mquery/ow/<siteid>')
 def mquery_by_siteid(siteid):
-  return {'data': db_man.mquery_siteid(int(siteid))}
+  return {'data': db_man.mquery_siteid(int(siteid)), 'isNew': db_man.recs_in_half_min(int(siteid))}
 
 @route('/mquery/detail/<seq>')
 def mquery_detail(seq):
