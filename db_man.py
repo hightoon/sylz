@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
+import os, os.path, shutil
 import pymssql, decimal
 import UserDb
 from datetime import datetime, date, timedelta
 from ftplib import FTP
+
+from PIL import Image
 
 """
     odbc db manipulation
@@ -460,12 +462,16 @@ def mquery_detail(seq):
         for k in row.keys():
             if k == 'smTime':
                 row[k] = datetime.strftime(row[k], '%Y-%m-%d %H:%M:%S')
-            elif k == 'smPlatePath':
+            elif k == 'smPlatePath' or k == 'smImgPath':
                 row[k] = row[k].replace(r'\\', '/')
                 retr_img_from_ftp(row[k])
-            elif k == 'smImgPath':
-                row[k] = row[k].replace(r'\\', '/')
-                retr_img_from_ftp(row[k])
+                fn, ext = os.path.splitext(row[k])
+                copy4mob = fn + '_sm' + ext
+                if not os.path.isfile(copy4mob):
+                    im = Image.open(row[k])
+                    im.resize((80, 60), Image.ANTIALIAS)
+                    im.save(copy4mob)
+                row[k] = copy4mob
             elif type(row[k]) == decimal.Decimal:
                 row[k] = str(row[k])
             else:
@@ -637,6 +643,14 @@ def get_site_name(siteid):
 def get_sites():
     conn = connectdb()
     cur = conn.cursor()
+    cur.execute('SELECT SiteID, SiteName FROM smSites')
+    sites = cur.fetchall()
+    conn.close()
+    return sites
+
+def mquery_sites():
+    conn = connectdb()
+    cur = conn.cursor(as_dict=True)
     cur.execute('SELECT SiteID, SiteName FROM smSites')
     sites = cur.fetchall()
     conn.close()

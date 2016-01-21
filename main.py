@@ -18,6 +18,8 @@ from bottle import route, request, redirect, template,static_file, run, app, hoo
 from ftplib import FTP
 from beaker.middleware import SessionMiddleware
 
+from PIL import Image
+
 # for py2exe module search
 import _mssql
 import decimal
@@ -815,6 +817,10 @@ def isblack(plate):
     res = 'yes'
   return {'data': res}
 
+@route('/mquery/allsites')
+def mallsites():
+  return {'data': db_man.mquery_sites()}
+
 @route('/extern_query')
 def exquery():
   return template('./view/bsfiles/view/extern_query.tpl',
@@ -1063,7 +1069,7 @@ def main():
   #websvr = Process(target=run, args=(app, 'wsgiref', '0.0.0.0', '8081'))
   #websvr.start()
   #websvr.join()
-  run(app, host='0.0.0.0', port=8081, server='cherrypy', debug=True)
+  run(app, host='0.0.0.0', port=8080, server='cherrypy', debug=True)
   #run(app, host='0.0.0.0', port=8081)
 
 
