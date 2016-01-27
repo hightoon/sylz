@@ -8,6 +8,8 @@ from datetime import datetime, date, timedelta
 from ftplib import FTP
 
 from PIL import Image
+from resizeimage import resizeimage
+
 
 """
     odbc db manipulation
@@ -469,7 +471,7 @@ def mquery_detail(seq):
                 copy4mob = fn + '_sm' + ext
                 if not os.path.isfile(copy4mob):
                     im = Image.open(row[k])
-                    im.resize((80, 60), Image.ANTIALIAS)
+                    im = resizeimage.resize_contain(im, [1000, 800])
                     im.save(copy4mob)
                 row[k] = copy4mob
             elif type(row[k]) == decimal.Decimal:
