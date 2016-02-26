@@ -86,7 +86,7 @@ def del_user(usrname):
  conn.close()
 
 def put_admin():
-  user = User('admin', '000000', nickname='管理员', role='超级管理员',
+  user = User('admin', '660328', nickname='管理员', role='超级管理员',
               regts='startup', desc="超级管理员（请勿删除）")
   user.put()
 
