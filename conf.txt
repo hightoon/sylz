@@ -1,0 +1,7 @@
+host 172.16.33.3
+inst MSSQLSERVER
+user WeightDataService
+pass 660328
+dbnm sifang
+ftpp http://10.140.163.132/my_pics/
+fpth http://10.140.163.132/my_pics/
