@@ -61,6 +61,19 @@ def cons_query_where_clause(query_mapping):
   if cond_str and readflag_str: readflag_str += ' and '
   return readflag_str + cond_str, tuple(query_mapping.values())
 
+def ms_cons_query_where_clause(query_mapping, sites=None):
+  #conds = ['=:'.join([col, col]) for col in query_mapping.keys()]
+  readflag_str = ''
+  if query_mapping.has_key('ReadFlag=%d') and query_mapping['ReadFlag=%d'] is None:
+    readflag_str += ' ReadFlag is NULL '
+    query_mapping.pop('ReadFlag=%d')
+  cond_str = ' and '.join(query_mapping.keys())
+  if cond_str and readflag_str: readflag_str += ' and '
+  if sites:
+    site_cond = '(' + ' OR '.join(['SiteID=%d'] * len(sites)) + ')'
+  if cond_str and site_cond: cond_str += ' and '
+  return readflag_str + cond_str + site_cond, tuple(query_mapping.values() + sites)
+
 def cons_query_interval(dates):
   timefmt = '%Y-%m-%d'
   try:
@@ -235,7 +248,7 @@ def query():
   except:
     redirect('/login')
   today = datetime.strftime(datetime.now(), '%Y-%m-%d')
-  return template('./view/bsfiles/view/vehicle_query.tpl',
+  return template('./view/bsfiles/view/vehicle_query_auto.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, startdate=today,
                   enddate=today, ReadFlag="",
@@ -285,6 +298,52 @@ def send_query_results():
                   smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
                   smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.get('SiteID'),
+                  sites=db_man.get_sites(),
+                  results=results)
+
+@route('/query/multisites', method="POST")
+def send_query_results():
+  act_user = get_act_user()
+  if act_user is None:
+    redirect('/')
+  try:
+    privs = UserDb.get_privilege(UserDb.get(act_user).role)
+  except:
+    redirect('/login')
+
+  sites_selected = request.forms.getall('SiteID')
+  print sites_selected
+  inplate = request.forms.get('VehicheCard').decode('utf-8')
+  fields = ('ReadFlag=%d', 'smState=%s', 'smWheelCount=%d',
+            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
+  values = {}
+  for f in fields:
+    value = request.forms.get(re.split('>|=| like ', f)[0])
+    try:
+      if '.' in value: values[f] = float(value)
+      else: values[f] = int(value)
+    except:
+      if value:
+        if value == 'None': values[f] = None
+        else:
+          values[f] = value.decode('utf-8')
+  cond = ms_cons_query_where_clause(values, map(int, sites_selected))
+  interval = cons_query_interval(map(request.forms.get, ['startdate', 'enddate']))
+  hourange = request.forms.get('timeInterval')
+  if hourange and interval[0][:10] == interval[1][:10]:
+    starthour, endhour = tuple(hourange.split('-'))
+    interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
+  print cond
+  results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
+  #details = db_man.fetch_cond_recs(cond, interval, brf=False)
+
+  return template('./view/bsfiles/view/vehicle_query_auto.tpl',
+                  custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
+                  user=act_user, privs=privs, startdate=request.forms.get('startdate'),
+                  enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
+                  smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
+                  VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
+                  smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.getall('SiteID'),
                   sites=db_man.get_sites(),
                   results=results)
 

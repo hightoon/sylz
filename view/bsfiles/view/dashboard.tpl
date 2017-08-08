@@ -45,20 +45,20 @@
                   </select>
                   </div>
                 </td>
-            </tr>
-            <tr>
-              <td>
-                <button type="submit" class="btn btn-md btn-primary" name="query" value="show">
-                  查询
-                </button>
-                <button type="submit" class="btn btn-md btn-success" name="export" value="export">
-                  导出
-                </button>
-              </td>
-            </tr>
-          </form>
-          </tbody>
-        </table>
+              </tr>
+              <tr>
+                <td>
+                  <button type="submit" class="btn btn-md btn-primary" name="query" value="show">
+                    查询
+                  </button>
+                  <button type="submit" class="btn btn-md btn-success" name="export" value="export">
+                    导出
+                  </button>
+                </td>
+              </tr>
+            </form>
+            </tbody>
+          </table>
 
           <!--div class="row placeholders placeholder">
             <div class="col-xs-3 col-sm-3 placeholder">

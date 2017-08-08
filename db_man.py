@@ -32,6 +32,7 @@ tabname2sqlcmd = {
 }
 
 status = {
+    0: '未处理',
     None: '未处理',
     1: '已申请处理',
     2: '处理申请已审核',
@@ -184,8 +185,9 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
-    #conn = pymssql.connect('192.168.0.6\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
+    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8', 
+    #                       cursorclass=pymysql.cursors.SSDictCursor)
+    conn = pymssql.connect('192.168.1.3\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
     #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn

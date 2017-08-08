@@ -203,7 +203,7 @@
           </table>
           %if results is not None:
           	<h3 class="sub-header">数据查询结果</h3>
-	        <table class="table table-striped">  
+	        <table class="table">  
 	          <thead>
 	          	<tr>
 	          	  %for col in results[0]:
@@ -214,7 +214,7 @@
 	          </thead>
 	          <tbody>
 	          	%for res in results[1:]:
-	          	  <tr>
+	          	  <tr onclick="$('.table tr').css('background-color', 'transparent');this.style.backgroundColor='green';">
 	          	  %for col in res:
 	          	    <td>{{col}}</td>
 	          	  %end
