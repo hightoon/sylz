@@ -187,7 +187,7 @@ def exec_sql_file(cur, f):
 def connectdb():
     #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8', 
     #                       cursorclass=pymysql.cursors.SSDictCursor)
-    conn = pymssql.connect('192.168.1.3\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
+    conn = pymssql.connect('192.168.1.6\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
     #conn = pymssql.connect('10.140.163.132\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
@@ -387,6 +387,7 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
     else:
         results = None
 
+    conn.close()
     return results
 
 def ext_query_all(plate):

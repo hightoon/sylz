@@ -69,6 +69,7 @@ def ms_cons_query_where_clause(query_mapping, sites=None):
     query_mapping.pop('ReadFlag=%d')
   cond_str = ' and '.join(query_mapping.keys())
   if cond_str and readflag_str: readflag_str += ' and '
+  site_cond = ''
   if sites:
     site_cond = '(' + ' OR '.join(['SiteID=%d'] * len(sites)) + ')'
   if cond_str and site_cond: cond_str += ' and '

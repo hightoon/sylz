@@ -203,7 +203,7 @@
           </table>
           %if results is not None:
           	<h3 class="sub-header">数据查询结果</h3>
-	        <table class="table">  
+	        <table class="table" id="veh-table">  
 	          <thead>
 	          	<tr>
 	          	  %for col in results[0]:
@@ -238,6 +238,13 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/view/bsfiles/js/jquery.min.js"></script>
     <script src="/static/view/bsfiles/js/bootstrap.min.js"></script>
+    <script src="/static/view/bsfiles/js/jquery-1.8.2.min.js"></script>
     <!--script src="/static/view/bsfiles/js/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script-->
+    <script src="/static/view/bsfiles/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function() {
+		    $('#veh-table').DataTable();
+		} );
+    </script>
 
 %include ('./view/bsfiles/view/html_footer.tpl')
