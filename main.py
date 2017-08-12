@@ -39,6 +39,10 @@ app = SessionMiddleware(app(), session_opts)
 def set_act_user(usrname):
   request.session['logged_in'] = usrname
 
+def save_query_conditions(cond, interval):
+  request.session['cond'] = cond
+  request.session['interval'] = interval
+
 def get_act_user():
   if 'logged_in' in request.session:
     return request.session['logged_in']
@@ -334,7 +338,7 @@ def send_query_results():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  print cond
+  save_query_conditions(cond, interval)
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
 
@@ -347,6 +351,13 @@ def send_query_results():
                   smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.getall('SiteID'),
                   sites=db_man.get_sites(),
                   results=results)
+
+@route('/query/multisites/rawdata')
+def sites_data():
+  cond = request.session['cond']
+  interval = request.session['interval']
+  print cond, interval
+  return {'data': db_man.fetch_cond_recs(cond, interval)}
 
 @route('/details/<seq>')
 def show_detail(seq):

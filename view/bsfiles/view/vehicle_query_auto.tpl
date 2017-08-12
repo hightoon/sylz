@@ -202,7 +202,15 @@
 	        </tbody>
           </table>
           %if results is not None:
-          	<h3 class="sub-header">数据查询结果</h3>
+          	<h3 class="sub-header">数据查询结果 
+          		<button class="btn btn-xs btn-info" name="refresh" value="show" onclick="autoRefresh();">
+          			自动刷新
+          		</button>
+          		<button class="btn btn-xs btn-warn" name="refresh" value="show" onclick="stopRefresh();">
+          			停止刷新
+          		</button>
+          	</h3>
+
 	        <table class="table" id="veh-table">  
 	          <thead>
 	          	<tr>
@@ -215,7 +223,7 @@
 	          <tbody>
 	          	%for res in results[1:]:
 	          	  <tr onclick="$('.table tr').css('background-color', 'transparent');this.style.backgroundColor='green';">
-	          	  %for col in res:
+	          	  %for i, col in enumerate(res):
 	          	    <td>{{col}}</td>
 	          	  %end
 	          	  <td>
@@ -243,8 +251,56 @@
     <script src="/static/view/bsfiles/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
     	$(document).ready(function() {
-		    $('#veh-table').DataTable();
+		    var tab = $('#veh-table').DataTable();
+			//setInterval( function () {
+			//    tab.ajax.reload('/query/multisites/rawdata');
+			//}, 5000 );
 		} );
+
+		function refresh() {
+			$.get("/query/multisites/rawdata", function(data){
+				var table = $('#veh-table').dataTable();
+				var oSettings = table.fnSettings();
+				table.fnClearTable(this);
+				for (var i=1; i<data.data.length; i++) //start from 1 to escape header
+			    {
+			    	var row = data.data[i];
+			    	var button = `<button type="button" class="btn btn-sm btn-primary" 
+	          	  			onclick="open_window('/details/${row[0]}');">
+	          	  		查看详情
+	          	  	</button>`;
+			    	row.push(button);
+			      	table.oApi._fnAddData(oSettings, row);
+			    }
+
+			    $('#veh-table tbody').on('click', 'tr', function () {
+			        $('#veh-table tr').css('background-color', 'transparent');
+					this.style.backgroundColor='green';
+			    } );
+
+			    oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+			    table.fnDraw();
+			});
+		}
+
+		function autoRefresh() {
+			window.refreshTid = setInterval(function(){
+				console.log('refreshed...');
+				refresh();
+			}, 10000);
+		}
+
+		function autoRefreshTimeout() {
+			refresh();
+			setTimeout(function(){console.log('reload table'); autoRefresh();}, 30000);
+		}
+
+		function stopRefresh() {
+			if (window.refreshTid) {
+				clearInterval(window.refreshTid);
+				window.refreshTid = null;
+			}
+		}
     </script>
 
 %include ('./view/bsfiles/view/html_footer.tpl')
