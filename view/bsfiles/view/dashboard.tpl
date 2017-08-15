@@ -13,14 +13,14 @@
             <form action="/statdata" method="POST">
               <tr>
                 <td>
-                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始时间</label>
+                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始日期</label>
                   <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
                   <input type="text" class="form-control input-sm" id="startdate" name="startdate" 
                   value={{startdate}}>
                   </div>
                 </td>
                 <td>
-                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">结束时间</label>
+                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">结束日期</label>
                   <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
                   <input type="text" class="form-control input-sm" id="enddate" name="enddate" 
                   value={{enddate}}>
@@ -40,7 +40,7 @@
                     %if siteid=="":
                     <option value="" selected>全部</option>
                     %else:
-                    <option value="">全部</option>
+                    <!--option value="">全部</option-->
                     %end
                   </select>
                   </div>
@@ -101,5 +101,22 @@
 
     <script src="/static/view/bsfiles/js/jquery.min.js"></script>
     <script src="/static/view/bsfiles/js/bootstrap.min.js"></script>
+    <script src="/static/view/bsfiles/js/plotly-latest.min.js"></script>
+    <script src="/static/view/bsfiles/js/numeric.min.js"></script>
+    <script src="/static/view/bsfiles/js/bootstrap-clockpicker.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var layout = {
+          height: 500,
+          width: 800
+        };
+        $.get( "/stat/json", function( data ) {
+          if (data.data !== 'notok') {
+            Plotly.newPlot('bardiv', data.bardata);
+            Plotly.newPlot('piediv', data.data, layout);
+          }
+        });
+      });
+    </script>
 
 %include ('./view/bsfiles/view/html_footer.tpl')

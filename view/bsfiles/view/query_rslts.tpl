@@ -35,7 +35,7 @@
   %else:
   %for i in xrange(numofsite):
   	<span style="color: blue">{{sites[i]}}</span>
-  	<table class="table">
+  	<!--table class="table">
 	<thead>
 		<tr>
 		  <th>序号</th>
@@ -52,7 +52,8 @@
 	      </tr>
 		%end
 	</tbody>
-  </table>
+    </table-->
+    <div id="bardiv"><!-- Plotly chart will be drawn inside this DIV --></div>
   %end
   %end
   <h4 style="color:red;"><mark>站点分时段超限率统计</mark></h4>
@@ -83,6 +84,7 @@
 		%end
 	</tbody>
   </table>
+  <div id="piediv"><!-- Plotly chart will be drawn inside this DIV --></div>
   %end
   %else:
   <h4 style="color:red;"><mark>站点超限总数</mark></h4>
@@ -115,4 +117,5 @@
 	</tbody>
   </table>
   %end
+
 </div>

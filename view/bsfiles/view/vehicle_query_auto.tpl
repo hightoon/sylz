@@ -13,32 +13,51 @@
 	      	  <form action="/query/multisites" method="POST">
 	      	  	<tr>
 	      	  	  <td>
-		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始时间</label>
+		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始日期</label>
 		      	  	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
 		        	  	<input type="text" class="form-control input-sm" id="startdate" name="startdate" 
 		        	  	value={{startdate}}>
 		        	  </div>
 		          </td>
 		          <td>
-		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">结束时间</label>
+		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">结束日期</label>
 		      	  	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
 		        	  	<input type="text" class="form-control input-sm" id="enddate" name="enddate" 
 		        	  	value={{enddate}}>
 		        	  </div>
 		          </td>
 		          <td>
-	                  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">时间段</label>
-	                  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
-	                  <select class="form-control input-sm" name="timeInterval">
-	                    <option value="" selected>全部</option>
-	                    %for hour in xrange(24): 
-	                    <option value="{{hour}}:00:00-{{hour}}:59:59">
-	                      {{hour}}:00:00-{{hour+1}}:00:00
-	                    </option>
-	                    %end
-	                  </select>
-	                  </div>
-                  </td>
+		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始时间</label>
+		      	  	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
+		        	  	<input type="text" class="form-control input-sm" id="starttime" name="starttime" 
+		        	  	value={{starttime}}>
+		        	  </div>
+		          </td>
+                </tr>
+                <tr>
+		          <td>
+		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">结束时间</label>
+		      	  	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
+		        	  	<input type="text" class="form-control input-sm" id="endtime" name="endtime" 
+		        	  	value={{endtime}}>
+		        	  </div>
+		          </td>
+		          <td>
+		          	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">超限率</label>
+		        	  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentLow" id="smLimitWeightPercentLow" value="10" />
+		        	  </div>
+		        	  <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">~</div>
+		        	  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentHigh" id="smLimitWeightPercentHigh" value="100" />
+		        	  </div>
+		          </td>
+		          <td>
+		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车重</label>
+		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
+		        	  	<input type="text" class="form-control input-sm" name="smTotalWeight"/>
+		        	  </div>
+	        	  </td>
                 </tr>
 		        <tr>
 	      	  	  <td>
@@ -164,7 +183,6 @@
 	        	  	<td>
 		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">超限率</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
-		        	  	<!--input type="text" class="form-control input-sm" name="smLimitWeightPercent"/-->
 		        	  	<select class="form-control input-sm" name="smLimitWeightPercent" id="smLimitWeightPercent">
 		        	  	%if smLimitWeightPercent == "":
 			        	  	%for i in xrange(10, 110, 10):
@@ -186,12 +204,6 @@
 	        	  	</td>
 	        	</tr>
 	        	<tr>
-	        	  	<td>
-		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">车重</label>
-		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
-		        	  	<input type="text" class="form-control input-sm" name="smTotalWeight"/>
-		        	  </div>
-	        	  	</td>
 	        	</tr>
 	        	<tr>
 	        	  <td>
@@ -206,7 +218,7 @@
           		<button class="btn btn-xs btn-info" name="refresh" value="show" onclick="autoRefresh();">
           			自动刷新
           		</button>
-          		<button class="btn btn-xs btn-warn" name="refresh" value="show" onclick="stopRefresh();">
+          		<button class="btn btn-xs btn-warning" name="refresh" value="show" onclick="location.reload(false);">
           			停止刷新
           		</button>
           	</h3>
@@ -249,12 +261,12 @@
     <script src="/static/view/bsfiles/js/jquery-1.8.2.min.js"></script>
     <!--script src="/static/view/bsfiles/js/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script-->
     <script src="/static/view/bsfiles/js/jquery.dataTables.min.js"></script>
+    <script src="/static/view/bsfiles/js/bootstrap-clockpicker.js"></script>
     <script type="text/javascript">
     	$(document).ready(function() {
 		    var tab = $('#veh-table').DataTable();
-			//setInterval( function () {
-			//    tab.ajax.reload('/query/multisites/rawdata');
-			//}, 5000 );
+			$('#starttime').clockpicker();
+			$('#endtime').clockpicker();
 		} );
 
 		function refresh() {
