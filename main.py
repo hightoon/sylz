@@ -11,7 +11,7 @@ import sys
 import time, urllib2, sqlite3, re, socket, os, json, httpagentparser
 #import time, urllib2, sqlite3
 #import SqlCmdHelper
-from datetime import datetime
+from datetime import datetime, timedelta
 from subprocess import Popen
 from multiprocessing import Process
 from bottle import route, request, redirect, template,static_file, run, app, hook
@@ -65,7 +65,7 @@ def cons_query_where_clause(query_mapping):
   if cond_str and readflag_str: readflag_str += ' and '
   return readflag_str + cond_str, tuple(query_mapping.values())
 
-def ms_cons_query_where_clause(query_mapping, sites=None):
+def ms_cons_query_where_clause(query_mapping, sites=None, percent_range=[0, 100]):
   #conds = ['=:'.join([col, col]) for col in query_mapping.keys()]
   readflag_str = ''
   if query_mapping.has_key('ReadFlag=%d') and query_mapping['ReadFlag=%d'] is None:
@@ -77,16 +77,40 @@ def ms_cons_query_where_clause(query_mapping, sites=None):
   if sites:
     site_cond = '(' + ' OR '.join(['SiteID=%d'] * len(sites)) + ')'
   if cond_str and site_cond: cond_str += ' and '
-  return readflag_str + cond_str + site_cond, tuple(query_mapping.values() + sites)
+  percent_low, percent_high = percent_range
+  percent = ''
+  if percent_low and percent_high:
+    percent = '(smLimitWeightPercent>%d AND smLimitWeightPercent<%d)'
+  if site_cond and percent: site_cond += ' and '
+  return readflag_str + cond_str + site_cond + percent, tuple(query_mapping.values() + sites + percent_range)
 
-def cons_query_interval(dates):
+def store_stat_query(siteid, startdate, enddate):
+  request.session['stat-siteid'] = siteid
+  request.session['stat-startdate'] = startdate
+  request.session['stat-enddate'] = enddate
+
+def cons_query_interval(dates, timerange):
   timefmt = '%Y-%m-%d'
   try:
     [datetime.strptime(t, timefmt) for t in dates]
   except:
     return None
   else:
-    return dates[0] + ' 00:00:00', dates[1] + ' 23:59:59'
+    return dates[0] + ' ' + timerange[0] + ':00', dates[1] + ' ' + timerange[1] + ':59'
+
+def cons_query_multi_interval(dates, timerange):
+  timefmt = '%Y-%m-%d'
+  try:
+    startd, endd = [datetime.strptime(t, timefmt) for t in dates]
+  except:
+    return None
+  else:
+    intervals = []
+    for d in xrange(abs(endd - startd).days):
+      cur = startd + timedelta(days=d)
+      intervals.append((cur.strftime(timefmt) + ' ' + timerange[0] + ':00',
+                        cur.strftime(timefmt) + ' ' + timerange[1] + ':59'))
+    return intervals
 
 def validate_from_db(usr, passwd):
   user = UserDb.get(usr)
@@ -160,6 +184,7 @@ def page_index():
     privs = UserDb.get_privilege(UserDb.get(act_user).role)
   except:
     redirect('/login')
+  request.session['stat-siteid'] = None
   today = datetime.strftime(datetime.now(), '%Y-%m-%d')
   #startdate = today + ' 00:00:00'
   #enddate = today + ' 23:59:59'
@@ -201,6 +226,7 @@ def stat():
   siteid = request.forms.get('SiteID')
   startdate = request.forms.get('startdate')
   enddate = request.forms.get('enddate')
+  store_stat_query(siteid, startdate, enddate)
   period = ''
   if startdate and enddate:
     startt = startdate + ' 00:00:00'
@@ -239,6 +265,29 @@ def stat():
                   startdate=startdate, enddate=enddate, siteid=siteid,
                   privs=privs)
 
+@route('/stat/json')
+def statjson():
+  if not request.session.has_key('stat-siteid') or request.session['stat-siteid'] is None: return {'data': 'notok'}
+  hourdata, percent = db_man.period_stat((request.session['stat-startdate'], request.session['stat-enddate']), 
+      siteid=request.session['stat-siteid'], percent=True)
+  if hourdata:
+    site = hourdata[0].keys()[0]
+    hourdata = [d[site] for d in hourdata]
+    hourdatax = ['%.2d:00-%.2d:00'%(x, x+1) for x in xrange(24)]
+  print hourdata
+  return {'data': [{
+    'values': percent[percent.keys()[0]],
+    'labels': ['正常', '轻微', '一般', '严重', '特别严重'],
+    'type': 'pie'
+    }],
+    'bardata': [{
+      'x': hourdatax,
+      'y': hourdata,
+      'type': 'bar'
+    }]
+  }
+
+
 @route('/statdata/export')
 def export():
   return 'ok, data exported.'
@@ -260,6 +309,7 @@ def query():
                   smState="", smLimitWeightPercent="",
                   VehicheCard="", smTotalWeight="", SiteID="",
                   smWheelCount="", sites=db_man.get_sites(),
+                  starttime='00:00', endtime='23:59',
                   privs=privs, results=None)
 
 @route('/query', method="POST")
@@ -318,9 +368,16 @@ def send_query_results():
 
   sites_selected = request.forms.getall('SiteID')
   print sites_selected
+  percent_low = request.forms.get('smLimitWeightPercentLow')
+  percent_high = request.forms.get('smLimitWeightPercentHigh')
+  try:
+    percent_low, percent_high = int(percent_low), int(percent_high)
+  except:
+    percent_low, percent_high = 0, 100
+  print percent_low, percent_high
   inplate = request.forms.get('VehicheCard').decode('utf-8')
   fields = ('ReadFlag=%d', 'smState=%s', 'smWheelCount=%d',
-            'smLimitWeightPercent>%d', 'smTotalWeight>%d')
+            'smTotalWeight>%d')
   values = {}
   for f in fields:
     value = request.forms.get(re.split('>|=| like ', f)[0])
@@ -332,14 +389,20 @@ def send_query_results():
         if value == 'None': values[f] = None
         else:
           values[f] = value.decode('utf-8')
-  cond = ms_cons_query_where_clause(values, map(int, sites_selected))
-  interval = cons_query_interval(map(request.forms.get, ['startdate', 'enddate']))
-  hourange = request.forms.get('timeInterval')
-  if hourange and interval[0][:10] == interval[1][:10]:
-    starthour, endhour = tuple(hourange.split('-'))
-    interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
+  cond = ms_cons_query_where_clause(values, map(int, sites_selected), [percent_low, percent_high])
+  interval = cons_query_interval(map(request.forms.get, ['startdate', 'enddate']), 
+                                 map(request.forms.get, ['starttime', 'endtime']))
+  #hourange = request.forms.get('timeInterval')
+  #if hourange and interval[0][:10] == interval[1][:10]:
+  #  starthour, endhour = tuple(hourange.split('-'))
+  #  interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
+  st, et = map(request.forms.get, ['starttime', 'endtime'])
   save_query_conditions(cond, interval)
+  results = []
+  print cond, interval
+  #for interval in intervals:
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
+  results = [results[0]] + [r for r in results[1:] if st < r[2].split()[1] < et] #r[2] is very ugly, i know it
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
 
   return template('./view/bsfiles/view/vehicle_query_auto.tpl',
@@ -349,7 +412,7 @@ def send_query_results():
                   smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
                   smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.getall('SiteID'),
-                  sites=db_man.get_sites(),
+                  sites=db_man.get_sites(), starttime='00:00', endtime='23:59',
                   results=results)
 
 @route('/query/multisites/rawdata')
@@ -357,7 +420,10 @@ def sites_data():
   cond = request.session['cond']
   interval = request.session['interval']
   print cond, interval
-  return {'data': db_man.fetch_cond_recs(cond, interval)}
+  results = db_man.fetch_cond_recs(cond, interval)
+  st, et = [t.split()[1] for t in request.session['interval']]
+  print st, et
+  return {'data': [results[0]] + [r for r in results[1:] if st < r[2].split()[1] < et]}
 
 @route('/details/<seq>')
 def show_detail(seq):
