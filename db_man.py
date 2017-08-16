@@ -185,10 +185,9 @@ def exec_sql_file(cur, f):
 
 
 def connectdb():
-    conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8', 
-                           cursorclass=pymysql.cursors.SSDictCursor)
+    #conn = pymssql.connect('%s'%(host,), '%s'%(user,), pswd, dbnm, charset='utf8')
     #conn = pymssql.connect('192.168.1.2\SQLEXPRESS', '.\\haitong', '111111', 'ssss', charset='utf8')
-    #conn = pymssql.connect('10.140.163.112\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
+    conn = pymssql.connect('10.140.163.112\SQLEXPRESS', '.\\quentin', '111111', 'ssss', charset='utf8')
     conn.autocommit(True)
     return conn
 
@@ -198,12 +197,14 @@ def drop_existing_tables():
     for s in init_db_cmds:
         cur.execute(s)
     conn.close()
+    del conn
 
 def drop_table(tn):
     conn = connectdb()
     cur = conn.cursor()
     cur.execute(init_db_cmds[tabname2sqlcmd[tn]])
     conn.close()
+    del conn
 
 def create_tables():
     #drop_table('blacklist')
@@ -388,6 +389,7 @@ def fetch_cond_recs(cond, interval, brf=True, inplate=''):
         results = None
 
     conn.close()
+    del conn
     return results
 
 def ext_query_all(plate):
@@ -452,6 +454,7 @@ def mquery_siteid(siteid):
                     tmp[keys[i]] = row[i]
         results.append(tmp)
     conn.close()
+    del conn
     return results
 
 def mquery_detail(seq):
@@ -484,6 +487,7 @@ def mquery_detail(seq):
                 except: pass
         results.append(row)
     conn.close()
+    del conn
     return results
 
 def mquery_history(plate):
@@ -521,6 +525,7 @@ def query_detail_by_seq(seq):
     result = [UserDb.Record.TAB_HDR]
     row = cur.fetchone()
     conn.close()
+    del conn
     if not row: return result
     local_plate_img = row['smPlatePath'].replace(r'\\', '_')
     remote_plate_img = row['smPlatePath'].replace(r'\\', '/')
@@ -560,6 +565,7 @@ def query_history_by_plate(plate):
     cur.execute('SELECT * FROM blacklist WHERE Plate=%s', plate)
     black = cur.fetchone()
     conn.close()
+    del conn
     for row in rows:
         local_plate_img = row['smPlatePath'].replace(r'\\', '_')
         remote_plate_img = row['smPlatePath'].replace(r'\\', '/')
@@ -633,6 +639,7 @@ def period_stat(p, percent=False, siteid=None):
                     percent_results[sn][pr] += 1
 
     conn.close()
+    del conn
     if percent: return results, percent_results
     return results
 
@@ -642,6 +649,7 @@ def get_site_name(siteid):
     cur.execute('SELECT SiteID, SiteName FROM smSites WHERE SiteID=%d', siteid)
     sn = cur.fetchone()
     conn.close()
+    del conn
     if sn is None: return '站点-%d'%(siteid)
     return sn['SiteName']
 
@@ -659,6 +667,7 @@ def mquery_sites():
     cur.execute('SELECT SiteID, SiteName FROM smSites')
     sites = cur.fetchall()
     conn.close()
+    del conn
     return sites
 
 def get_site_name_cache(siteid, sites):
@@ -676,6 +685,7 @@ def get_site_ids():
         cur.execute("SELECT SiteID FROM smHighWayDate")
         rows = cur.fetchall()
     conn.close()
+    del conn
     return list(set([row[0] for row in rows]))
 
 def get_ow_tons(total, limit):
@@ -690,6 +700,7 @@ def update_read_flag(seq, value):
     cur.execute('UPDATE smHighWayDate SET ReadFlag=%d, ProcTime=CAST(%s AS DATETIME) WHERE Xuhao=%d',
                 (value, datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S'), seq))
     conn.close()
+    del conn
 
 def update_regtime(seq, ts):
     conn = connectdb()
