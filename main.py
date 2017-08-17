@@ -226,7 +226,6 @@ def stat():
   siteid = request.forms.get('SiteID')
   startdate = request.forms.get('startdate')
   enddate = request.forms.get('enddate')
-  store_stat_query(siteid, startdate, enddate)
   period = ''
   if startdate and enddate:
     startt = startdate + ' 00:00:00'
@@ -237,6 +236,7 @@ def stat():
     startt = today + ' 00:00:00'
     endt = today + ' 23:59:59'
     period = today
+  store_stat_query(siteid, startt, endt)
   results, percent_results = db_man.period_stat((startt, endt), siteid=siteid, percent=True)
   sites = list(results[0].keys())
   numofsite = len(sites)
@@ -423,7 +423,8 @@ def sites_data():
   results = db_man.fetch_cond_recs(cond, interval)
   st, et = [t.split()[1] for t in request.session['interval']]
   print st, et
-  return {'data': [results[0]] + [r for r in results[1:] if st < r[2].split()[1] < et]}
+  data = [r for r in results[1:] if st < r[2].split()[1] < et]
+  return {'data': [results[0]] + data}
 
 @route('/details/<seq>')
 def show_detail(seq):
