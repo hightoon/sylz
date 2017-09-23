@@ -307,10 +307,10 @@ def query():
                   user=act_user, startdate=today,
                   enddate=today, ReadFlag="",
                   smState="", smLimitWeightPercent="",
-                  VehicheCard="", smTotalWeight="", SiteID="",
+                  VehicheCard="", smTotalWeight="", SiteID=db_man.get_sites(),
                   smWheelCount="", sites=db_man.get_sites(),
                   starttime='00:00', endtime='23:59',
-                  privs=privs, results=None)
+                  privs=privs, results=[UserDb.Record.TAB_BRF_HDR])
 
 @route('/query', method="POST")
 def send_query_results():
@@ -342,7 +342,7 @@ def send_query_results():
   if hourange and interval[0][:10] == interval[1][:10]:
     starthour, endhour = tuple(hourange.split('-'))
     interval = (interval[0][:10]+' '+starthour, interval[1][:10]+' '+endhour)
-  print cond
+  #print cond
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
 
@@ -367,7 +367,9 @@ def send_query_results():
     redirect('/login')
 
   sites_selected = request.forms.getall('SiteID')
-  print sites_selected
+  #print('sites selected:', sites_selected)
+  if sites_selected: 
+    sites_selected = sites_selected[0].split(',')
   percent_low = request.forms.get('smLimitWeightPercentLow')
   percent_high = request.forms.get('smLimitWeightPercentHigh')
   try:
@@ -399,21 +401,27 @@ def send_query_results():
   st, et = map(request.forms.get, ['starttime', 'endtime'])
   save_query_conditions(cond, interval)
   results = []
-  print cond, interval
   #for interval in intervals:
   results = db_man.fetch_cond_recs(cond, interval, inplate=inplate)
-  results = [results[0]] + [r for r in results[1:] if st < r[2].split()[1] < et] #r[2] is very ugly, i know it
+  #results = [r for r in results if st < r[2].split()[1] < et] #r[2] is very ugly, i know it
   #details = db_man.fetch_cond_recs(cond, interval, brf=False)
-
+  if results:
+    tab_hd = results[0]
+    results = results[1:] #remove tab header
+  data = [r for r in results if st < r[2].split()[1] < et]
+  data = [[float(d) if type(d)==decimal.Decimal else d for d in r] for r in data]
+  return {'data': data}
+  '''
   return template('./view/bsfiles/view/vehicle_query_auto.tpl',
                   custom_hdr='./view/bsfiles/view/dashboard_cus_file.tpl',
                   user=act_user, privs=privs, startdate=request.forms.get('startdate'),
                   enddate=request.forms.get('enddate'), ReadFlag=request.forms.get('ReadFlag'),
                   smState=request.forms.get('smState'), smLimitWeightPercent=request.forms.get('smLimitWeightPercent'),
                   VehicheCard=request.forms.get('VehicheCard'), smTotalWeight=request.forms.get('smTotalWeight'),
-                  smWheelCount=request.forms.get('smWheelCount'), SiteID=request.forms.getall('SiteID'),
+                  smWheelCount=request.forms.get('smWheelCount'), SiteID=''.join(request.forms.getall('SiteID')),
                   sites=db_man.get_sites(), starttime='00:00', endtime='23:59',
                   results=results)
+  '''
 
 @route('/query/multisites/rawdata')
 def sites_data():
@@ -425,8 +433,7 @@ def sites_data():
   #print st, et
   data = [r for r in results[1:] if st < r[2].split()[1] < et]
   data = [[float(d) if type(d)==decimal.Decimal else d for d in r] for r in data]
-  #print data
-  return {'data': [results[0]] + data}
+  return {'data': data}
 
 @route('/details/<seq>')
 def show_detail(seq):
