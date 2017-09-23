@@ -10,7 +10,7 @@
       	  <h3 class="sub-header">数据查询（内部使用）</h3>
       	  <table class="table table-striped">
       	  	<tbody>
-	      	  <form action="/query/multisites" method="POST">
+	      	  <form id="queryform">
 	      	  	<tr>
 	      	  	  <td>
 		      	  	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">开始日期</label>
@@ -132,14 +132,14 @@
 		        	  </div>
 	        	  </td>
 	        	  <td>
-		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点<br/>(ctrl+A全选)</label>
+		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">站点</label>
 		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
 		        	  <select class="form-control input-sm" name="SiteID" id="siteid" multiple="multiple">
 		        	  	%for site in sites:
 		        	  		%if str(site[0]) in SiteID:
 	        				<option value={{site[0]}} selected>{{site[1]}}</option>
 	        				%else:
-	        				<option value={{site[0]}}>{{site[1]}}</option>
+	        				<option value={{site[0]}} selected>{{site[1]}}</option>
 	        				%end
 	        			%end
 	        			%if SiteID=="": 
@@ -180,45 +180,25 @@
 		        	  	<input type="text" class="form-control input-sm" name="VehicheCard" value={{VehicheCard}}>
 		        	  </div>
 	        	  	</td>
-	        	  	<td>
-		        	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">超限率</label>
-		        	  <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6">
-		        	  	<select class="form-control input-sm" name="smLimitWeightPercent" id="smLimitWeightPercent">
-		        	  	%if smLimitWeightPercent == "":
-			        	  	%for i in xrange(10, 110, 10):
-		        			<option value="{{i}}">{{i}}</option>
-		        			%end
-		        			<option value="" selected>全部</option>
-	        			%else:
-	        				%for i in xrange(10, 110, 10):
-		        				%if str(i) == smLimitWeightPercent:
-			        			<option value="{{i}}" selected>{{i}}</option>
-			        			%else:
-			        			<option value="{{i}}">{{i}}</option>
-			        			%end
-		        			%end
-		        			<option value="">全部</option>
-	        			%end
-		        	  	</select>
-		        	  </div>
-	        	  	</td>
 	        	</tr>
 	        	<tr>
-	        	</tr>
-	        	<tr>
-	        	  <td>
-	        		<button type="submit" class="btn btn-md btn-primary" name="query" value="show">查询</button>
-	        	  </td>
 	        	</tr>
 	          </form>
+	          <tr>
+	        	  <td>
+	        		<button onclick="postQform();" class="btn btn-md btn-primary" name="query" value="show">查询</button>
+	        	  </td>
+	        	</tr>
 	        </tbody>
           </table>
           %if results is not None:
           	<h3 class="sub-header">数据查询结果 
-          		<button class="btn btn-xs btn-info" name="refresh" value="show" onclick="autoRefresh();">
+          		<button class="btn btn-xs btn-info" name="refresh" value="show" id="startButton"
+          		onclick="autoRefresh();$(this).prop('disabled',true);$('#stopButton').prop('disabled', false);alert('开始自动刷新纪录，刷新周期：30秒');">
           			自动刷新
           		</button>
-          		<button class="btn btn-xs btn-warning" name="refresh" value="show" onclick="location.reload(false);">
+          		<button class="btn btn-xs btn-warning" name="refresh" value="show" id="stopButton"
+          		onclick="stopRefresh();$(this).prop('disabled',true);$('#startButton').prop('disabled', false);alert('已停止刷新数据!')">
           			停止刷新
           		</button>
           	</h3>
@@ -262,11 +242,22 @@
     <!--script src="/static/view/bsfiles/js/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script-->
     <script src="/static/view/bsfiles/js/jquery.dataTables.min.js"></script>
     <script src="/static/view/bsfiles/js/bootstrap-clockpicker.js"></script>
+    <script src="/static/view/bsfiles/js/bootstrap-multiselect.js"></script>
     <script type="text/javascript">
     	$(document).ready(function() {
 		    var tab = $('#veh-table').DataTable();
 			$('#starttime').clockpicker();
 			$('#endtime').clockpicker();
+			// siteid multiselect
+			$('#siteid').multiselect({
+				includeSelectAllOption: true,
+				onChange: function(option, checked) {
+					//console.log(option, checked);
+				},
+	            onDropdownShown: function(event) {
+	                alert('Dropdown closed.');
+	            }
+	        });
 		} );
 
 		function refresh() {
@@ -274,7 +265,7 @@
 				var table = $('#veh-table').dataTable();
 				var oSettings = table.fnSettings();
 				table.fnClearTable(this);
-				for (var i=1; i<data.data.length; i++) //start from 1 to escape header
+				for (var i=0; i<data.data.length; i++)
 			    {
 			    	var row = data.data[i];
 			    	var button = `<button type="button" class="btn btn-sm btn-primary" 
@@ -295,11 +286,35 @@
 			});
 		}
 
+		function update_veh_tab(data) {
+			var table = $('#veh-table').dataTable();
+			var oSettings = table.fnSettings();
+			table.fnClearTable(this);
+			for (var i=0; i<data.data.length; i++) 
+		    {
+		    	var row = data.data[i];
+		    	var button = `<button type="button" class="btn btn-sm btn-primary" 
+          	  			onclick="open_window('/details/${row[0]}');">
+          	  		查看详情
+          	  	</button>`;
+		    	row.push(button);
+		      	table.oApi._fnAddData(oSettings, row);
+		    }
+
+		    $('#veh-table tbody').on('click', 'tr', function () {
+		        $('#veh-table tr').css('background-color', 'transparent');
+				this.style.backgroundColor='green';
+		    } );
+
+		    oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+		    table.fnDraw();
+		}
+
 		function autoRefresh() {
 			window.refreshTid = setInterval(function(){
 				console.log('refreshed...');
 				refresh();
-			}, 10000);
+			}, 30000);
 		}
 
 		function autoRefreshTimeout() {
@@ -312,6 +327,16 @@
 				clearInterval(window.refreshTid);
 				window.refreshTid = null;
 			}
+		}
+
+		function postQform() {
+			//console.log($('#queryform').serialize());
+			$.post( "/query/multisites", 
+					$( "#queryform" ).serialize() + '&' + $.param({SiteID: $('#siteid').val().join(',')}),
+					function(data){
+						update_veh_tab(data);
+					} 
+			);
 		}
     </script>
 

@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="/static/view/bsfiles/js/jquery-ui-1.11.4.custom/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="/static/view/bsfiles/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="/static/view/bsfiles/css/bootstrap-clockpicker.css">
+    <link rel="stylesheet" type="text/css" href="/static/view/bsfiles/css/bootstrap-multiselect.css">
     <!-- other custom style/js files -->
     %if custom_hdr:
       %include (custom_hdr)
