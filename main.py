@@ -419,11 +419,13 @@ def send_query_results():
 def sites_data():
   cond = request.session['cond']
   interval = request.session['interval']
-  print cond, interval
+  #print cond, interval
   results = db_man.fetch_cond_recs(cond, interval)
   st, et = [t.split()[1] for t in request.session['interval']]
-  print st, et
+  #print st, et
   data = [r for r in results[1:] if st < r[2].split()[1] < et]
+  data = [[float(d) if type(d)==decimal.Decimal else d for d in r] for r in data]
+  #print data
   return {'data': [results[0]] + data}
 
 @route('/details/<seq>')
@@ -1207,7 +1209,7 @@ def main():
   #websvr = Process(target=run, args=(app, 'wsgiref', '0.0.0.0', '8081'))
   #websvr.start()
   #websvr.join()
-  run(app, host='0.0.0.0', port=8080, server='cherrypy', debug=True)
+  run(app, host='0.0.0.0', port=8081, server='cherrypy', debug=True)
   #run(app, host='0.0.0.0', port=8081)
 
 
