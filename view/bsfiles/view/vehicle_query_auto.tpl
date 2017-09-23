@@ -45,11 +45,11 @@
 		          <td>
 		          	  <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">超限率</label>
 		        	  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentLow" id="smLimitWeightPercentLow" value="10" />
+		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentLow" id="smLimitWeightPercentLow" />
 		        	  </div>
 		        	  <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">~</div>
 		        	  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentHigh" id="smLimitWeightPercentHigh" value="100" />
+		        	  	<input type="text" class="form-control input-sm" name="smLimitWeightPercentHigh" id="smLimitWeightPercentHigh" />
 		        	  </div>
 		          </td>
 		          <td>
